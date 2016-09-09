@@ -4,3 +4,15 @@
     left: 0px;
     background: transparent;
 }
+#canvas-player {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background: transparent;
+}
+#canvas-game {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background: transparent;
+}
