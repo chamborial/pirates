@@ -3,16 +3,19 @@
     top: 0px;
     left: 0px;
     background: transparent;
+    z-index: -2;
 }
 #canvas-player {
     position: absolute;
     top: 0px;
     left: 0px;
     background: transparent;
+    z-index: 0;
 }
 #canvas-game {
     position: absolute;
     top: 0px;
     left: 0px;
     background: transparent;
+    z-index: -1;
 }
