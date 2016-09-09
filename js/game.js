@@ -8,6 +8,7 @@ var images = new function() {
     this.enemyRock      = new Image();
     this.enemyCraig     = new Image();
     this.craigWarning   = new Image();
+    this.explosion      = new Image();
 
     // Map our image objects to files
     this.background.src     = "img/kenneyGraphics/PNG/rpgTile029.png";
@@ -16,7 +17,39 @@ var images = new function() {
     this.enemyDuck.src      = "img/kenneyGraphics/PNG/duck_yellow.png";
     this.enemyRock.src      = "img/kenneyGraphics/PNG/spaceMeteors_001.png";
     this.enemyCraig.src     = "img/kenneyGraphics/PNG/craigship.png";
-    this.craigWarning.src   = "img/kenneyGraphics/PNG/craigWarning.png"
+    this.craigWarning.src   = "img/kenneyGraphics/PNG/craigWarning2.png";
+    this.explosion.src      = "img/kenneyGraphics/PNG/explosion07.png";
+}
+
+function Enemies(maxEnemies) {
+    var maxEnemies;
+    var enemies = [];
+
+    this.init = function() {
+        for (var i = 0; i < maxEnemies; i++) {
+            var enemy = new Enemy();
+            enemy.init(0, 0, 0, 0, ENEMY_TYPE.DEAD, 0);
+            enemies[i] = enemy;
+        }
+    }
+
+    this.draw = function() {
+        for (var i = 0; i < maxEnemies; i++) {
+            if (enemies[i].enemy_type != ENEMY_TYPE.DEAD) {
+                enemies[i].draw();
+                if (enemies[i].enemy_state == ENEMY_STATE.DEAD) {
+                    enemies[i].clean();
+                    enemies.push((enemies.splice(i,1))[0]);
+                }
+            }
+        }
+    }
+
+    this.spawn = function(x, y, enemyType, speed) {
+        if (enemies[maxEnemies-1].enemy_type == ENEMY_TYPE.DEAD) {
+            //TODO: MAKE THIS WORK
+        }
+    }
 }
 
 // The base drawable object which all objects with graphics will inherit.
@@ -94,8 +127,8 @@ function Game() {
 
             this.background = new Background();
             this.background.init(0, 0, 64, 64);
-            this.enemy      = new Enemy();
-            this.enemy.init(1080, 300, images.enemyCraig.width, images.enemyCraig.height, ENEMY_TYPE.CRAIG, 2);
+            this.enemies = new Enemies(8);
+            this.enemies.init();
             return true;
         } else {
             return false;
@@ -109,7 +142,7 @@ function Game() {
 function doFrame() {
     requestAnimFrame( doFrame );
     game.background.draw();
-    game.enemy.draw();
+    game.enemies.draw();
 }
 
 /**
