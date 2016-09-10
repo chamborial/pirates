@@ -10,70 +10,40 @@ var images = new function() {
     this.craigWarning   = new Image();
     this.explosion      = new Image();
     this.cball          = new Image();
-    
-    
-//    // Make sure all the required images are loaded before game start
-//    // This fixes a known pre IE10 bug where init would be called before images had loaded
-//    var imgCount = 3;
-//    var imgLoaded = 0;
-//    
-//    function imgloaded(){
-//        imgLoaded++;
-//        if (imgLoaded === imgCount){
-//            window.init(); // All images are loaded
-//        }
-//    }
-//    
-//    this.background.onload = function() {
-//		imgloaded();
-//	}
-//	this.playerShip.onload = function() {
-//		imgloaded();
-//	}
-//	this.cball.onload = function() {
-//		imgloaded();
-//	}
+
+
+   // Make sure all the required images are loaded before game start
+   // This fixes a known pre IE10 bug where init would be called before images had loaded
+   var imgCount = 9;
+   var imgLoaded = 0;
+
+   function imgloaded(){
+       imgLoaded++;
+       if (imgLoaded === imgCount){
+           window.init(); // All images are loaded
+       }
+   }
+   // Have the images call the imgloaded function when they finish loading
+   this.background.onload = imgloaded;
+   this.playerShip.onload = imgloaded;
+   this.enemyShip.onload = imgloaded;
+   this.enemyDuck.onload = imgloaded;
+   this.enemyRock.onload = imgloaded;
+   this.enemyCraig.onload = imgloaded;
+   this.craigWarning.onload = imgloaded;
+   this.explosion.onload = imgloaded;
+   this.cball.onload = imgloaded;
 
     // Map our image objects to files
-    this.background.src     = "img/kenneyGraphics/PNG/rpgTile029.png";
-    this.playerShip.src     = "img/kenneyGraphics/PNG/pship.png";
-    this.enemyShip.src      = "img/kenneyGraphics/PNG/enemyship.png";
-    this.enemyDuck.src      = "img/kenneyGraphics/PNG/duck_yellow.png";
-    this.enemyRock.src      = "img/kenneyGraphics/PNG/spaceMeteors_001.png";
-    this.enemyCraig.src     = "img/kenneyGraphics/PNG/craigship.png";
-    this.craigWarning.src   = "img/kenneyGraphics/PNG/craigWarning2.png";
-    this.explosion.src      = "img/kenneyGraphics/PNG/explosion07.png";
-}
-
-function Enemies(maxEnemies) {
-    var maxEnemies;
-    var enemies = [];
-
-    this.init = function() {
-        for (var i = 0; i < maxEnemies; i++) {
-            var enemy = new Enemy();
-            enemy.init(0, 0, 0, 0, ENEMY_TYPE.DEAD, 0);
-            enemies[i] = enemy;
-        }
-    }
-
-    this.draw = function() {
-        for (var i = 0; i < maxEnemies; i++) {
-            if (enemies[i].enemy_type != ENEMY_TYPE.DEAD) {
-                enemies[i].draw();
-                if (enemies[i].enemy_state == ENEMY_STATE.DEAD) {
-                    enemies[i].clean();
-                    enemies.push((enemies.splice(i,1))[0]);
-                }
-            }
-        }
-    }
-
-    this.spawn = function(x, y, enemyType, speed) {
-        if (enemies[maxEnemies-1].enemy_type == ENEMY_TYPE.DEAD) {
-            //TODO: MAKE THIS WORK
-        }
-    }
+    this.background.src     = "img/waterTile.png";
+    this.playerShip.src     = "img/pship.png";
+    this.enemyShip.src      = "img/enemyship.png";
+    this.enemyDuck.src      = "img/duck.png";
+    this.enemyRock.src      = "img/rock.png";
+    this.enemyCraig.src     = "img/craigship.png";
+    this.craigWarning.src   = "img/craigWarning.png";
+    this.explosion.src      = "img/explosion.png";
+    this.cball.src          = "img/cannonBall.png";
 }
 
 // The base drawable object which all objects with graphics will inherit.
