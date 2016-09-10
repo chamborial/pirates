@@ -1,3 +1,8 @@
+var GAME_STATE = Object.freeze({    TITLE:      0,
+                                    PLAYING:    1,
+                                    PAUSED:     2,
+                                    GAME_OVER:  3});
+
 // Create an object which will hold all of our graphics so we only have to load them once
 var images = new function() {
     // Create image objects
@@ -91,27 +96,23 @@ function Background() {
 }
 Background.prototype = new Drawable();
 
-/*function PlayerShip() {
-    this.draw = function() {
-        this.context.drawImage(images.playerShip, this.x, this.y, this.imageWidth, this.imageHeight)
-    }
-}
-PlayerShip.prototype = new Drawable();*/
-
 function Game() {
     this.init = function() {
-        this.bgCanvas   = document.getElementById('canvas-background');
-        this.gameCanvas = document.getElementById('canvas-game');
-        this.playerCanvas = document.getElementById('canvas-player');
-        
+        // Get the 3 canvases
+        this.wave = 0;
+        this.state = GAME_STATE.PLAYING
+        this.bgCanvas       = document.getElementById('canvas-background');
+        this.gameCanvas     = document.getElementById('canvas-game');
+        this.playerCanvas   = document.getElementById('canvas-player');
+
         // Check if the canvas is supported
         if (this.bgCanvas.getContext) {
-            // Get the canvas context
+            // Get the canvas contexts
             this.bgContext      = this.bgCanvas.getContext('2d');
-            this.playerContext = this.playerCanvas.getContext('2d');
+            this.playerContext  = this.playerCanvas.getContext('2d');
             this.gameContext    = this.gameCanvas.getContext('2d');
 
-            // Assign the context to each of the objects
+            // Assign the correct context to each of the objects
             Background.prototype.context        = this.bgContext;
             Background.prototype.canvasWidth    = this.bgCanvas.width;
             Background.prototype.canvasHeight   = this.bgCanvas.height;
@@ -125,40 +126,85 @@ function Game() {
             Cball.prototype.canvasHeight        = this.gameCanvas.height;
             Cball.prototype.canvasWidth         = this.gameCanvas.width;
 
+            // Initialise the objects which will always be present
             this.background = new Background();
             this.background.init(0, 0, 64, 64);
             this.enemies = new Enemies(8);
             this.enemies.init();
-            
+
             this.ship = new Ship();
-            
+
             // Start ship at bottom of canvas
      /*       var shipStartX = this.playerCanvas.width/2 - images.playerShip.width;
-			var shipStartY = this.playerCanvas.height/4*3 + images.playerShip.height*2;*/
-            
-		/*	this.ship.init(shipStartX, shipStartY, images.playerShip.width,
-			               images.playerShip.height);*/
-            
+            var shipStartY = this.playerCanvas.height/4*3 + images.playerShip.height*2;*/
+
+            /*this.ship.init(shipStartX, shipStartY, images.playerShip.width,
+                           images.playerShip.height);*/
+
             this.ship.init(20, 20, 20,
-			               20);
-            
+                           20);
+
             return true;
         } else {
             return false;
         }
     }
     this.start = function() {
+        // Draw the ship for the first frame, as otherwise it is only drawn when it moves.
         this.ship.draw();
         doFrame();
+    }
+    this.nextWave = function() {
+        // Spawn the wave, then increment the wave counter.
+        switch (this.wave++) {
+            case 0:
+                // Spawn the enemies for the first wave
+                break;
+            case 1:
+                // Spawn the enemies for the second wave
+                break;
+            case 2:
+                // Spawn the enemies for the third wave
+                break;
+            case 3:
+                // Spawn the enemies for the fourth wave
+                break;
+            case 4:
+                // Spawn the enemies for the final wave
+                this.enemies.spawn(1080, 252, ENEMY_TYPE.CRAIG, 2);
+                break;
+            default:
+        }
+        console.log("Spawned wave ", this.wave);
     }
 }
 
 function doFrame() {
     requestAnimFrame( doFrame );
+    switch (game.state) {
+        case GAME_STATE.TITLE:
+            break;
+        case GAME_STATE.PLAYING:
+            doGameFrame();
+            break;
+        case GAME_STATE.PAUSED:
+            break;
+        case GAME_STATE.GAME_OVER:
+            break;
+        default:
+    }
+}
+
+function doGameFrame() {
+    // Update the game state for each of the objects
     game.background.draw();
     game.enemies.draw();
     game.ship.move();
     game.ship.ballPool.animate();
+    // Begin the next wave if the last one has been cleared
+    if (game.enemies.areAllDead()) {
+        game.nextWave()
+    }
 }
 
 /**
@@ -167,14 +213,14 @@ function doFrame() {
  * otherwise defaults to setTimeout().
  */
 window.requestAnimFrame = (function(){
-	return  window.requestAnimationFrame   ||
-			window.webkitRequestAnimationFrame ||
-			window.mozRequestAnimationFrame    ||
-			window.oRequestAnimationFrame      ||
-			window.msRequestAnimationFrame     ||
-			function(/* function */ callback, /* DOMElement */ element){
-				window.setTimeout(callback, 1000 / 60);
-			};
+    return  window.requestAnimationFrame   ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame    ||
+            window.oRequestAnimationFrame      ||
+            window.msRequestAnimationFrame     ||
+            function(/* function */ callback, /* DOMElement */ element){
+                window.setTimeout(callback, 1000 / 60);
+            };
 })();
 
 var game = new Game();

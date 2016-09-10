@@ -8,18 +8,28 @@ const ENEMY_STATE = Object.freeze({ DEAD:           0,
                                     ROCK_MOVE:      6,
                                     CRAIG_APPROACH: 10});
 
-const ENEMY_TYPE = Object.freeze({  DEAD: 0,
+const ENEMY_TYPE = Object.freeze({  NONE: 0,
                                     DUCK: 1,
                                     SHIP: 2,
                                     ROCK: 3,
                                     CRAIG: 10});
+
+// Store the sizes of each enemy type
+const DUCK_WIDTH    = 50;
+const DUCK_HEIGHT   = 50;
+const SHIP_WIDTH    = 215;
+const SHIP_HEIGHT   = 100;
+const ROCK_WIDTH    = 100;
+const ROCK_HEIGHT   = 100;
+const CRAIG_WIDTH   = 468;
+const CRAIG_HEIGHT  = 225;
 
 function Enemy() {
     // Set up the timer which will count up each frame and be used for 'AI' decisions.
     this.timer = 0;
     this.speed = 0;
     this.state = ENEMY_STATE.DEAD;
-    this.enemyType = ENEMY_TYPE.DEAD;
+    this.enemyType = ENEMY_TYPE.NONE;
 
     this.init = function(x, y, width, height, type, speed) {
         this.x = x;
@@ -29,7 +39,7 @@ function Enemy() {
         this.enemyType = type;
         this.speed = speed;
         switch (type) {
-            case ENEMY_TYPE.DEAD:
+            case ENEMY_TYPE.NONE:
                 this.state = ENEMY_STATE.DEAD;
                 break;
             case ENEMY_TYPE.CRAIG:
@@ -73,7 +83,8 @@ function Enemy() {
                 this.x = this.x - this.speed;
                 // After 100 frames, start moving up
                 if (this.timer >= 200) {
-                    if (this.enemyType == ENEMY_TYPE.DUCK) {
+                    // If the enemy is a duck, stop moving.
+                    if (this.enemyType === ENEMY_TYPE.DUCK) {
                         this.state = ENEMY_STATE.STATIONARY;
                     } else {
                         this.state = ENEMY_STATE.MOVE_UP;
@@ -84,7 +95,7 @@ function Enemy() {
                 this.timer += 1;
                 break;
             case ENEMY_STATE.MOVE_UP:
-                // Move the ship up 3 pixels per frame
+                // Move the ship up (speed) pixels per frame
                 this.y = this.y - this.speed;
                 // After 100 frames, start moving down
                 if (this.timer >= 100) {
@@ -94,7 +105,7 @@ function Enemy() {
                 this.timer += 1;
                 break;
             case ENEMY_STATE.MOVE_DOWN:
-                // Move the ship down 3 pixels per frame
+                // Move the ship down (speed) pixels per frame
                 this.y = this.y + this.speed;
                 if (this.timer >= 100) {
                     this.state = ENEMY_STATE.MOVE_UP;
@@ -107,8 +118,6 @@ function Enemy() {
                     // Kill the rock if it goes off screen
                     this.state = ENEMY_STATE.DEAD;
                     this.context.clearRect(this.x - this.speed, this.y - this.speed, this.imageWidth + (this.speed * 2), this.imageHeight + (this.speed * 2));
-                    // Set the timer to 31 so as not to render an explosion
-                    this.timer = 31
                 }
                 this.x = this.x - this.speed;
                 break;
@@ -116,7 +125,9 @@ function Enemy() {
                 // Be a sitting duck
                 break;
             case ENEMY_STATE.CRAIG_APPROACH:
+                // Move slowly onto the screen in an intimidating fashion
                 this.x = this.x - this.speed/2;
+                // Display a flashing warning sign
                 if (this.timer % 180 < 90) {
                     this.context.drawImage(images.craigWarning, 0, 260, 1080, 200);
                 }
@@ -151,7 +162,73 @@ function Enemy() {
         this.x = 0;
         this.y = 0;
         this.state = ENEMY_STATE.DEAD;
-        this.enemyType = ENEMY_TYPE.DEAD;
+        this.enemyType = ENEMY_TYPE.NONE;
     }
 }
 Enemy.prototype = new Drawable();
+
+// Keep an array of enemies so we don't have to repeatedly create new ones.
+// Living enemies are at the beginning of the list, unused enemies are kept at the end.
+function Enemies(maxEnemies) {
+    var maxEnemies;
+    var enemies = [];
+
+    this.init = function() {
+        for (var i = 0; i < maxEnemies; i++) {
+            var enemy = new Enemy();
+            enemy.init(0, 0, 0, 0, ENEMY_TYPE.NONE, 0);
+            enemies[i] = enemy;
+        }
+    }
+
+    this.draw = function() {
+        for (var i = 0; i < maxEnemies; i++) {
+            if (enemies[i].enemyType != ENEMY_TYPE.NONE) {
+                enemies[i].draw();
+                if (enemies[i].state === ENEMY_STATE.DEAD) {
+                    // Move the dead enemy's object to the end of the array so it can be easily found and re-used
+                    enemies[i].clean();
+                    enemies.push((enemies.splice(i,1))[0]);
+                }
+            } else {
+                // Since the living enemies are all at the start of the array, we don't need to iterate through the rest.
+                break;
+            }
+        }
+    }
+
+    this.spawn = function(x, y, enemyType, speed) {
+        if (enemies[maxEnemies-1].enemyType === ENEMY_TYPE.NONE) {
+            var newEnemy = enemies.pop()
+            // Initialise the enemy with the correct enemy type.
+            switch (enemyType) {
+                case ENEMY_TYPE.DUCK:
+                    newEnemy.init(x, y, DUCK_WIDTH, DUCK_HEIGHT, enemyType, speed);
+                    break;
+                case ENEMY_TYPE.SHIP:
+                    newEnemy.init(x, y, SHIP_WIDTH, SHIP_HEIGHT, enemyType, speed)
+                    break;
+                case ENEMY_TYPE.ROCK:
+                    newEnemy.init(x, y, ROCK_WIDTH, ROCK_HEIGHT, enemyType, speed)
+                    break;
+                case ENEMY_TYPE.CRAIG:
+                    newEnemy.init(x, y, CRAIG_WIDTH, CRAIG_HEIGHT, enemyType, speed)
+                    break;
+                default:
+                    // Put that thing back where it came from, or so help me!
+                    // (so we don't lose things from the list)
+                    enemies.push(newEnemy);
+            }
+            // Bring the enemy at the end of the array to the front, so it's not with the dead enemies any more.
+            enemies.unshift(newEnemy);
+        }
+    }
+
+    this.areAllDead = function() {
+        return (enemies[0].enemyType === ENEMY_TYPE.NONE)
+    }
+
+    this.getEnemies = function() {
+        return enemies;
+    }
+}
