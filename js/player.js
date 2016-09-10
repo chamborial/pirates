@@ -1,4 +1,7 @@
-// Pool object - reuses old objects instead of creating & deleting new ones. (Reduces lag)
+// Player dimensions
+const PLAYER_WIDTH = 140
+const PLAYER_HEIGHT = 80
+    // Pool object - reuses old objects instead of creating & deleting new ones. (Reduces lag)
 function Pool(maxsize) {
     var size = maxsize; // The maximum number of bullets allowed
     var pool = [];
@@ -58,7 +61,6 @@ function Cball() {
         this.speed = 0;
         this.isInUse = false;
     };
-    
 }
 Cball.prototype = new Drawable();
 
@@ -69,90 +71,77 @@ function Ship() {
     var rate = 15;
     var counter = 0;
     this.draw = function () {
-        this.context.drawImage(images.playerShip, this.x, this.y);
+        this.context.drawImage(images.playerShip, this.x, this.y, PLAYER_WIDTH, PLAYER_HEIGHT);
     };
     this.move = function () {
         counter++;
         // Capture keys related to movement
         if (KEY_STATUS.left || KEY_STATUS.right || KEY_STATUS.down || KEY_STATUS.up) {
             // Erase current image as movement has been requested
-            this.context.clearRect(this.x, this.y, this.width, this.height);
-            switch (KEY_STATUS) {
-            case KEY_STATUS.left:
+            this.context.clearRect(this.x, this.y, PLAYER_WIDTH, PLAYER_HEIGHT);
+            
+            // Used else if instead of switch case - as switch case allowed diagonal movement
+            if (KEY_STATUS.left) {
                 this.x -= this.speed
-                if (this.x <= 0) // Ensure player is within the screen
-                    this.x = 0
-                break;
-            case KEY_STATUS.right:
+                if (this.x <= 0) // Ensure the player is within the screen
+                    this.x = 0;
+            }
+            else if (KEY_STATUS.right) {
                 this.x += this.speed
                 if (this.x >= this.canvasWidth - this.width) this.x = this.canvasWidth - this.width;
-                break;
-            case KEY_STATUS.up:
+            }
+            else if (KEY_STATUS.up) {
                 this.y -= this.speed
                 if (this.y <= this.canvasHeight / 4 * 3) this.y = this.canvasHeight / 4 * 3;
-                break;
-            case KEY_STATUS.down:
-                    this.y += this.speed
-                    if (this.y >= this.canvasHeight - this.height)
-                        this.y = this.canvasHeight - this.height;
-                break;
+            }
+            else if (KEY_STATUS.down) {
+                this.y += this.speed
+                if (this.y >= this.canvasHeight - this.height) this.y = this.canvasHeight - this.height;
             }
             // Re draw the player ship
             this.draw();
         }
-        
         // If space call fire
-        if (KEY_STATUS.space && counter >= rate){
+        if (KEY_STATUS.space && counter >= rate) {
             this.fire();
             counter = 0;
         }
     };
-    
     // FIRE!!!!!!!!!!!
-    this.fire = function(){
-        this.ballpool.getBall(this.x+6,this.y,3);
+    this.fire = function () {
+        this.ballpool.getBall(this.x + 6, this.y, 3);
     };
-
 }
 Ship.prototype = new Drawable();
-
 //Key codes to be mapped
 KEY_CODES = {
-    32: 'space',
-    37: 'left',
-    38: 'up',
-    39: 'right',
-    40: 'down'
-}
-
-
-// Array to hold all key codes & sets all values to false
+        32: 'space'
+        , 37: 'left'
+        , 38: 'up'
+        , 39: 'right'
+        , 40: 'down'
+    }
+    // Array to hold all key codes & sets all values to false
 KEY_STATUS = {};
-for (code in KEY_CODES){
+for (code in KEY_CODES) {
     KEY_STATUS[KEY_CODES[code]] = false;
 }
-
-document.addEventListener('keydown', function(e) {
-     console.log(e.keyCode)
-     // var keyCode = (e.charCode) ? e.charCode : e.charCode;
-    if (KEY_CODES[e.keyCode]){
+document.addEventListener('keydown', function (e) {
+    console.log(e.keyCode)
+        // var keyCode = (e.charCode) ? e.charCode : e.charCode;
+    if (KEY_CODES[e.keyCode]) {
         e.preventDefault();
         KEY_STATUS[KEY_CODES[e.keyCode]] = true;
     }
 });
-
-document.addEventListener('keyup', function(e) {
-     console.log(e.keyCode)
-     // var keyCode = (e.charCode) ? e.charCode : e.charCode;
-    if (KEY_CODES[e.keyCode]){
+document.addEventListener('keyup', function (e) {
+    console.log(e.keyCode)
+        // var keyCode = (e.charCode) ? e.charCode : e.charCode;
+    if (KEY_CODES[e.keyCode]) {
         e.preventDefault();
         KEY_STATUS[KEY_CODES[e.keyCode]] = false;
     }
 });
-
-
-
-
 /*// Return the pressed key
 // Firefox & Opera = charCode
 document.onkeydown = function(e){
