@@ -65,7 +65,7 @@ function Cball() {
 Cball.prototype = new Drawable();
 
 function Ship() {
-    this.speed = 3;
+    this.speed = 5;
     this.ballPool = new Pool(30);
     this.ballPool.init();
     var rate = 15;
@@ -92,7 +92,7 @@ function Ship() {
             }
             else if (KEY_STATUS.up) {
                 this.y -= this.speed
-                if (this.y <= this.canvasHeight / 4 * 3) this.y = this.canvasHeight / 4 * 3;
+                if (this.y <= this.canvasHeight / this.height) this.y = this.canvasHeight / this.height;
             }
             else if (KEY_STATUS.down) {
                 this.y += this.speed
