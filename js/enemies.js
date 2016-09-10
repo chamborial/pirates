@@ -34,8 +34,8 @@ function Enemy() {
     this.init = function(x, y, width, height, type, speed) {
         this.x = x;
         this.y = y;
-        this.imageWidth = width;
-        this.imageHeight = height;
+        this.width = width;
+        this.height = height;
         this.enemyType = type;
         this.speed = speed;
         switch (type) {
@@ -55,29 +55,10 @@ function Enemy() {
 
     // Move and draw the enemy
     this.draw = function() {
+        // Clear the last drawing of the enemy
+        this.context.clearRect(this.x - this.speed, this.y - this.speed, this.width + (this.speed * 2), this.height + (this.speed * 2));
         // Draw the enemy if they're alive
-        if (this.state != ENEMY_STATE.DEAD) {
-        // First, clear the last drawing of the enemy
-            this.context.clearRect(this.x - this.speed, this.y - this.speed, this.imageWidth + (this.speed * 2), this.imageHeight + (this.speed * 2));
-            switch (this.enemyType) {
-                case ENEMY_TYPE.DUCK:
-                    this.context.drawImage(images.enemyDuck, this.x, this.y, this.imageWidth, this.imageHeight);
-                    break;
-                case ENEMY_TYPE.SHIP:
-                    this.context.drawImage(images.enemyShip, this.x, this.y, this.imageWidth, this.imageHeight);
-                    break;
-                case ENEMY_TYPE.ROCK:
-                    this.context.drawImage(images.enemyRock, this.x, this.y, this.imageWidth, this.imageHeight);
-                    break;
-                case ENEMY_TYPE.CRAIG:
-                    // Ensure that we've cleared the WARNING banner
-                    this.context.clearRect(0, 260, 1080, 200);
-                    this.context.drawImage(images.enemyCraig, this.x, this.y, this.imageWidth, this.imageHeight);
-                    break;
-            }
-        }
         switch (this.state) {
-
             case ENEMY_STATE.APPROACH:
                 // Move the ship onto the screen
                 this.x = this.x - this.speed;
@@ -114,10 +95,10 @@ function Enemy() {
                 this.timer += 1;
                 break;
             case ENEMY_STATE.ROCK_MOVE:
-                if (this.x + this.imageWidth < 0) {
+                if (this.x + this.width < 0) {
                     // Kill the rock if it goes off screen
                     this.state = ENEMY_STATE.DEAD;
-                    this.context.clearRect(this.x - this.speed, this.y - this.speed, this.imageWidth + (this.speed * 2), this.imageHeight + (this.speed * 2));
+                    this.context.clearRect(this.x - this.speed, this.y - this.speed, this.width + (this.speed * 2), this.height + (this.speed * 2));
                 }
                 this.x = this.x - this.speed;
                 break;
@@ -127,13 +108,10 @@ function Enemy() {
             case ENEMY_STATE.CRAIG_APPROACH:
                 // Move slowly onto the screen in an intimidating fashion
                 this.x = this.x - this.speed/2;
-                // Display a flashing warning sign
-                if (this.timer % 180 < 90) {
-                    this.context.drawImage(images.craigWarning, 0, 260, 1080, 200);
-                }
                 if (this.timer >= 450) {
                     this.state = ENEMY_STATE.MOVE_UP;
                     this.timer = 50;
+                    break;
                 }
                 this.timer += 1;
                 break;
@@ -141,19 +119,35 @@ function Enemy() {
                 // Display an explosion graphic for 30 frames
                 if (this.timer <= 60) {
                     // TODO: Display the explosion graphic
-                    this.context.drawImage(images.explosion, this.x, this.y, this.imageWidth, this.imageHeight);
+                    this.context.drawImage(images.explosion, this.x, this.y, this.width, this.height);
                     this.timer += 1;
                 } else {
-                    this.context.clearRect(this.x, this.y, this.imageWidth, this.imageHeight);
+                    this.context.clearRect(this.x, this.y, this.width, this.height);
                     this.state = ENEMY_STATE.DEAD;
                 }
                 break;
             case ENEMY_STATE.DEAD:
-                this.context.clearRect(this.x, this.y, this.imageWidth, this.imageHeight);
+                this.context.clearRect(this.x, this.y, this.width, this.height);
                 break;
             default:
                 // If the state ends up incorrect somehow, kill the enemy.
                 this.state = ENEMY_STATE.DEAD
+        }
+        if (this.state != ENEMY_STATE.DEAD) {
+            switch (this.enemyType) {
+                case ENEMY_TYPE.DUCK:
+                    this.context.drawImage(images.enemyDuck, this.x, this.y, this.width, this.height);
+                    break;
+                case ENEMY_TYPE.SHIP:
+                    this.context.drawImage(images.enemyShip, this.x, this.y, this.width, this.height);
+                    break;
+                case ENEMY_TYPE.ROCK:
+                    this.context.drawImage(images.enemyRock, this.x, this.y, this.width, this.height);
+                    break;
+                case ENEMY_TYPE.CRAIG:
+                    this.context.drawImage(images.enemyCraig, this.x, this.y, this.width, this.height);
+                    break;
+            }
         }
     }
     this.clean = function() {
@@ -182,11 +176,13 @@ function Enemies(maxEnemies) {
     }
 
     this.draw = function() {
+        // Iterate through each living enemy, calling their draw function
         for (var i = 0; i < maxEnemies; i++) {
             if (enemies[i].enemyType != ENEMY_TYPE.NONE) {
                 enemies[i].draw();
+                // If the draw function caused the enemy to move to the "dead" state,
+                // Move the dead enemy's object to the end of the array so it can be easily found and re-used
                 if (enemies[i].state === ENEMY_STATE.DEAD) {
-                    // Move the dead enemy's object to the end of the array so it can be easily found and re-used
                     enemies[i].clean();
                     enemies.push((enemies.splice(i,1))[0]);
                 }
@@ -199,20 +195,20 @@ function Enemies(maxEnemies) {
 
     this.spawn = function(x, y, enemyType, speed) {
         if (enemies[maxEnemies-1].enemyType === ENEMY_TYPE.NONE) {
-            var newEnemy = enemies.pop()
+            var newEnemy = enemies.pop();
             // Initialise the enemy with the correct enemy type.
             switch (enemyType) {
                 case ENEMY_TYPE.DUCK:
                     newEnemy.init(x, y, DUCK_WIDTH, DUCK_HEIGHT, enemyType, speed);
                     break;
                 case ENEMY_TYPE.SHIP:
-                    newEnemy.init(x, y, SHIP_WIDTH, SHIP_HEIGHT, enemyType, speed)
+                    newEnemy.init(x, y, SHIP_WIDTH, SHIP_HEIGHT, enemyType, speed);
                     break;
                 case ENEMY_TYPE.ROCK:
-                    newEnemy.init(x, y, ROCK_WIDTH, ROCK_HEIGHT, enemyType, speed)
+                    newEnemy.init(x, y, ROCK_WIDTH, ROCK_HEIGHT, enemyType, speed);
                     break;
                 case ENEMY_TYPE.CRAIG:
-                    newEnemy.init(x, y, CRAIG_WIDTH, CRAIG_HEIGHT, enemyType, speed)
+                    newEnemy.init(x, y, CRAIG_WIDTH, CRAIG_HEIGHT, enemyType, speed);
                     break;
                 default:
                     // Put that thing back where it came from, or so help me!
@@ -225,7 +221,7 @@ function Enemies(maxEnemies) {
     }
 
     this.areAllDead = function() {
-        return (enemies[0].enemyType === ENEMY_TYPE.NONE)
+        return enemies[0].enemyType === ENEMY_TYPE.NONE;
     }
 
     this.getEnemies = function() {

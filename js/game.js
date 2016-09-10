@@ -15,11 +15,12 @@ var images = new function() {
     this.craigWarning   = new Image();
     this.explosion      = new Image();
     this.cball          = new Image();
+    this.paused         = new Image();
 
 
    // Make sure all the required images are loaded before game start
    // This fixes a known pre IE10 bug where init would be called before images had loaded
-   var imgCount = 9;
+   var imgCount = 10;
    var imgLoaded = 0;
 
    function imgloaded(){
@@ -29,15 +30,16 @@ var images = new function() {
        }
    }
    // Have the images call the imgloaded function when they finish loading
-   this.background.onload = imgloaded;
-   this.playerShip.onload = imgloaded;
-   this.enemyShip.onload = imgloaded;
-   this.enemyDuck.onload = imgloaded;
-   this.enemyRock.onload = imgloaded;
-   this.enemyCraig.onload = imgloaded;
+   this.background.onload   = imgloaded;
+   this.playerShip.onload   = imgloaded;
+   this.enemyShip.onload    = imgloaded;
+   this.enemyDuck.onload    = imgloaded;
+   this.enemyRock.onload    = imgloaded;
+   this.enemyCraig.onload   = imgloaded;
    this.craigWarning.onload = imgloaded;
-   this.explosion.onload = imgloaded;
-   this.cball.onload = imgloaded;
+   this.explosion.onload    = imgloaded;
+   this.cball.onload        = imgloaded;
+   this.paused.onload       = imgloaded;
 
     // Map our image objects to files
     this.background.src     = "img/waterTile.png";
@@ -49,6 +51,7 @@ var images = new function() {
     this.craigWarning.src   = "img/craigWarning.png";
     this.explosion.src      = "img/explosion.png";
     this.cball.src          = "img/cannonBall.png";
+    this.paused.src         = "img/paused.png";
 }
 
 // The base drawable object which all objects with graphics will inherit.
@@ -96,14 +99,31 @@ function Background() {
 }
 Background.prototype = new Drawable();
 
+function Hud() {
+    this.draw = function() {
+
+    }
+
+    this.drawPaused = function() {
+
+    }
+
+    this.drawWarning = function() {
+
+    }
+}
+
 function Game() {
     this.init = function() {
         // Get the 3 canvases
         this.wave = 0;
         this.state = GAME_STATE.PLAYING
+        this.bossApproachTimer = 0;
+        this.pauseDelay = 0;
         this.bgCanvas       = document.getElementById('canvas-background');
         this.gameCanvas     = document.getElementById('canvas-game');
         this.playerCanvas   = document.getElementById('canvas-player');
+        this.hudCanvas      = document.getElementById('canvas-hud');
 
         // Check if the canvas is supported
         if (this.bgCanvas.getContext) {
@@ -111,6 +131,7 @@ function Game() {
             this.bgContext      = this.bgCanvas.getContext('2d');
             this.playerContext  = this.playerCanvas.getContext('2d');
             this.gameContext    = this.gameCanvas.getContext('2d');
+            this.hudContext     = this.hudCanvas.getContext('2d');
 
             // Assign the correct context to each of the objects
             Background.prototype.context        = this.bgContext;
@@ -141,19 +162,44 @@ function Game() {
             /*this.ship.init(shipStartX, shipStartY, images.playerShip.width,
                            images.playerShip.height);*/
 
-            this.ship.init(20, 20, 20,
-                           20);
+            this.ship.init(20, 20, 233,
+                           100);
 
             return true;
         } else {
             return false;
         }
     }
+
+    this.drawHud = function() {
+        switch (this.state) {
+            case GAME_STATE.PLAYING:
+                if (this.bossApproachTimer > 1) {
+                    if (this.bossApproachTimer % 120 === 0) {
+                        this.hudContext.drawImage(images.craigWarning, 0, 260, 1080, 200);
+                    } else if (this.bossApproachTimer % 120 === 60) {
+                        this.hudContext.clearRect(0, 260, 1080, 200);
+                    }
+                    this.bossApproachTimer -= 1;
+                }
+                break;
+            case GAME_STATE.PAUSED:
+                if (this.timePaused % 20 === 0) {
+                    this.hudContext.drawImage(images.paused, 452, 560, 175, 60);
+                } else if (this.timePaused % 20 === 10) {
+                    this.hudContext.clearRect(452, 560, 175, 60);
+                }
+                break;
+            default:
+        }
+    }
+
     this.start = function() {
         // Draw the ship for the first frame, as otherwise it is only drawn when it moves.
         this.ship.draw();
         doFrame();
     }
+
     this.nextWave = function() {
         // Spawn the wave, then increment the wave counter.
         switch (this.wave++) {
@@ -171,6 +217,7 @@ function Game() {
                 break;
             case 4:
                 // Spawn the enemies for the final wave
+                this.bossApproachTimer = 450;
                 this.enemies.spawn(1080, 252, ENEMY_TYPE.CRAIG, 2);
                 break;
             default:
@@ -188,6 +235,7 @@ function doFrame() {
             doGameFrame();
             break;
         case GAME_STATE.PAUSED:
+            doPausedFrame();
             break;
         case GAME_STATE.GAME_OVER:
             break;
@@ -201,10 +249,37 @@ function doGameFrame() {
     game.enemies.draw();
     game.ship.move();
     game.ship.ballPool.animate();
+    game.drawHud();
     // Begin the next wave if the last one has been cleared
     if (game.enemies.areAllDead()) {
         game.nextWave()
     }
+
+    // Pause the game if the player hits P
+    if (game.pauseDelay <= 0) {
+        if (KEY_STATUS.p) {
+            game.state = GAME_STATE.PAUSED;
+            game.pauseDelay = 30;
+            game.timePaused = 0;
+        }
+    } else {
+        game.pauseDelay = game.pauseDelay - 1;
+    }
+}
+
+function doPausedFrame() {
+    game.drawHud()
+    // Unpause the game if the player hits P
+    if (game.pauseDelay <= 0) {
+        if (KEY_STATUS.p) {
+            game.state = GAME_STATE.PLAYING;
+            game.pauseDelay = 30;
+            game.hudContext.clearRect(452, 560, 175, 60);
+        }
+    } else {
+        game.pauseDelay = game.pauseDelay - 1;
+    }
+    game.timePaused = game.timePaused + 1;
 }
 
 /**
