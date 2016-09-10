@@ -1,6 +1,7 @@
 //Key codes to be mapped
 KEY_CODES = Object.freeze({
-        32: 'space'
+        13: 'enter'
+        , 32: 'space'
         , 37: 'left'
         , 38: 'up'
         , 39: 'right'

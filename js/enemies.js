@@ -66,9 +66,11 @@ function Enemy() {
                 if (this.timer >= 200) {
                     // If the enemy is a duck, stop moving.
                     if (this.enemyType === ENEMY_TYPE.DUCK) {
-                        this.state = ENEMY_STATE.STATIONARY;
+                        //this.state = ENEMY_STATE.STATIONARY;
+                        this.state = ENEMY_STATE.DYING;
                     } else {
-                        this.state = ENEMY_STATE.MOVE_UP;
+                        //this.state = ENEMY_STATE.MOVE_UP;
+                        this.state = ENEMY_STATE.DYING;
                     }
                     // Start the enemy half-way through the move up/down cycle
                     this.timer = 50;

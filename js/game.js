@@ -16,11 +16,12 @@ var images = new function() {
     this.explosion      = new Image();
     this.cball          = new Image();
     this.paused         = new Image();
+    this.logo           = new Image();
 
 
    // Make sure all the required images are loaded before game start
    // This fixes a known pre IE10 bug where init would be called before images had loaded
-   var imgCount = 10;
+   var imgCount = 11;
    var imgLoaded = 0;
 
    function imgloaded(){
@@ -40,6 +41,7 @@ var images = new function() {
    this.explosion.onload    = imgloaded;
    this.cball.onload        = imgloaded;
    this.paused.onload       = imgloaded;
+   this.logo.onload         = imgloaded;
 
     // Map our image objects to files
     this.background.src     = "img/waterTile.png";
@@ -52,6 +54,7 @@ var images = new function() {
     this.explosion.src      = "img/explosion.png";
     this.cball.src          = "img/cannonBall.png";
     this.paused.src         = "img/paused.png";
+    this.logo.src           = "img/skullAndCrossbones.png";
 }
 
 // The base drawable object which all objects with graphics will inherit.
@@ -117,9 +120,10 @@ function Game() {
     this.init = function() {
         // Get the 3 canvases
         this.wave = 0;
-        this.state = GAME_STATE.PLAYING
-        this.bossApproachTimer = 0;
+        this.state = GAME_STATE.TITLE
+        this.globalTimer = 0;
         this.pauseDelay = 0;
+        this.bossApproachTimer = 0;
         this.bgCanvas       = document.getElementById('canvas-background');
         this.gameCanvas     = document.getElementById('canvas-game');
         this.playerCanvas   = document.getElementById('canvas-player');
@@ -173,6 +177,13 @@ function Game() {
 
     this.drawHud = function() {
         switch (this.state) {
+            case GAME_STATE.TITLE:
+                if (this.globalTimer === 0) {
+                    console.log("Drawing logo");
+                    this.hudContext.drawImage(images.logo, (1080 - images.logo.width)/2, (720 - images.logo.height)/2, images.logo.width, images.logo.height);
+                    //this.hudContext.drawImage(images.logo, 440, 260, 200, 200);
+                }
+                break;
             case GAME_STATE.PLAYING:
                 if (this.bossApproachTimer > 1) {
                     if (this.bossApproachTimer % 120 === 0) {
@@ -184,9 +195,9 @@ function Game() {
                 }
                 break;
             case GAME_STATE.PAUSED:
-                if (this.timePaused % 20 === 0) {
+                if (this.globalTimer % 20 === 0) {
                     this.hudContext.drawImage(images.paused, 452, 560, 175, 60);
-                } else if (this.timePaused % 20 === 10) {
+                } else if (this.globalTimer % 20 === 10) {
                     this.hudContext.clearRect(452, 560, 175, 60);
                 }
                 break;
@@ -194,9 +205,12 @@ function Game() {
         }
     }
 
+    this.clearHud = function () {
+        this.hudContext.clearRect(0,0,1080,720);
+    }
+
     this.start = function() {
         // Draw the ship for the first frame, as otherwise it is only drawn when it moves.
-        this.ship.draw();
         doFrame();
     }
 
@@ -205,17 +219,31 @@ function Game() {
         switch (this.wave++) {
             case 0:
                 // Spawn the enemies for the first wave
+                this.enemies.spawn(1340, 95, ENEMY_TYPE.DUCK, 2);
+                this.enemies.spawn(1340, 335, ENEMY_TYPE.DUCK, 2);
+                this.enemies.spawn(1340, 575, ENEMY_TYPE.DUCK, 2);
+                this.enemies.spawn(1260, 215, ENEMY_TYPE.DUCK, 2);
+                this.enemies.spawn(1260, 455, ENEMY_TYPE.DUCK, 2);
+                this.enemies.spawn(1180, 335, ENEMY_TYPE.DUCK, 2);
                 break;
             case 1:
                 // Spawn the enemies for the second wave
+                this.enemies.spawn(1180, 335, ENEMY_TYPE.SHIP, 2);
+                this.enemies.spawn(1340, 95, ENEMY_TYPE.SHIP, 2);
+                this.enemies.spawn(1340, 575, ENEMY_TYPE.SHIP, 2);
                 break;
             case 2:
                 // Spawn the enemies for the third wave
+                this.enemies.spawn(1180, 335, ENEMY_TYPE.SHIP, 3);
+                this.enemies.spawn(1340, 95, ENEMY_TYPE.SHIP, 3);
+                this.enemies.spawn(1340, 575, ENEMY_TYPE.SHIP, 3);
+                this.enemies.spawn(1500, 95, ENEMY_TYPE.ROCK, 2);
+                this.enemies.spawn(1700, 575, ENEMY_TYPE.ROCK, 2);
+                this.enemies.spawn(1600, 340, ENEMY_TYPE.ROCK, 2);
+                this.enemies.spawn(1750, 225, ENEMY_TYPE.ROCK, 2);
+                this.enemies.spawn(1800, 655, ENEMY_TYPE.ROCK, 2);
                 break;
             case 3:
-                // Spawn the enemies for the fourth wave
-                break;
-            case 4:
                 // Spawn the enemies for the final wave
                 this.bossApproachTimer = 450;
                 this.enemies.spawn(1080, 252, ENEMY_TYPE.CRAIG, 2);
@@ -230,6 +258,7 @@ function doFrame() {
     requestAnimFrame( doFrame );
     switch (game.state) {
         case GAME_STATE.TITLE:
+            doTitleFrame();
             break;
         case GAME_STATE.PLAYING:
             doGameFrame();
@@ -240,6 +269,17 @@ function doFrame() {
         case GAME_STATE.GAME_OVER:
             break;
         default:
+    }
+    game.globalTimer = game.globalTimer + 1;
+}
+
+function doTitleFrame() {
+    game.background.draw();
+    game.drawHud();
+    if (KEY_STATUS.enter) {
+        game.clearHud();
+        game.ship.draw();
+        game.state = GAME_STATE.PLAYING;
     }
 }
 
@@ -260,7 +300,6 @@ function doGameFrame() {
         if (KEY_STATUS.p) {
             game.state = GAME_STATE.PAUSED;
             game.pauseDelay = 30;
-            game.timePaused = 0;
         }
     } else {
         game.pauseDelay = game.pauseDelay - 1;
@@ -273,13 +312,12 @@ function doPausedFrame() {
     if (game.pauseDelay <= 0) {
         if (KEY_STATUS.p) {
             game.state = GAME_STATE.PLAYING;
-            game.pauseDelay = 30;
+            game.pauseDelay = 10;
             game.hudContext.clearRect(452, 560, 175, 60);
         }
     } else {
         game.pauseDelay = game.pauseDelay - 1;
     }
-    game.timePaused = game.timePaused + 1;
 }
 
 /**
