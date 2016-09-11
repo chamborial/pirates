@@ -120,6 +120,7 @@ function Game() {
         this.globalTimer = 0;
         this.pauseDelay = 0;
         this.bossApproachTimer = 0;
+        this.lives = 3;
         this.bgCanvas       = document.getElementById('canvas-background');
         this.gameCanvas     = document.getElementById('canvas-game');
         this.playerCanvas   = document.getElementById('canvas-player');
@@ -134,10 +135,10 @@ function Game() {
             this.hudContext     = this.hudCanvas.getContext('2d');
             
             // Clear each canvas so that the game starts with fresh canvases
-            this.bgContext.clearRect(0, 0, bgCanvas.width, bgCanvas.height)
-            this.playerContext.clearRect(0, 0, playerCanvas.width, playerCanvas.height)
-            this.gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height)
-            this.hudContext.clearRect(0, 0, hudCanvas.width, hudCanvas.height)
+            this.bgContext.clearRect(0, 0, this.bgCanvas.width, this.bgCanvas.height)
+            this.playerContext.clearRect(0, 0, this.playerCanvas.width, this.playerCanvas.height)
+            this.gameContext.clearRect(0, 0, this.gameCanvas.width, this.gameCanvas.height)
+            this.hudContext.clearRect(0, 0, this.hudCanvas.width, this.hudCanvas.height)
             
             // Assign the correct context to each of the objects
             Background.prototype.context        = this.bgContext;
@@ -268,13 +269,6 @@ function Game() {
         }
         console.log("Spawned wave ", this.wave);
     }
-
-    this.lives = 3;
-    if(this.lives <= 0){
-        alert("dead");
-        console.log(this.lives);
-    }
-
 }
 
 function doFrame() {
@@ -333,6 +327,9 @@ function doGameFrame() {
     } else {
         game.pauseDelay = game.pauseDelay - 1;
     }
+    if(game.lives <= 0){
+        game.state = GAME_STATE.GAME_OVER;
+    }
 }
 
 function doPausedFrame() {
@@ -353,9 +350,7 @@ function doGameOverFrame() {
     game.background.draw();
     game.drawHud();
     if (KEY_STATUS.enter) {
-        if(game.init()) {
-            game.start();
-        }
+        game.init();
     }
 }
 
@@ -363,9 +358,7 @@ function doVictoryFrame() {
     game.background.draw();
     game.drawHud();
     if (KEY_STATUS.enter) {
-        if(game.init()) {
-            game.start();
-        }
+        game.init();
     }
 }
 
@@ -395,12 +388,35 @@ function init() {
 }
 
 function playerHit() {
-    if (testCollision(
-        game.ship.x, game.ship.y, PLAYER_WIDTH, PLAYER_HEIGHT, game.enemyBulletPool.x, game.enemyBulletPool.y))
-    {
-        this.lives = this.lives - 1;
-      //  boxArray.splice(i, 1);
-    }           
+    // Check collision between the player and bullets
+    for (var i = 0; i < game.enemyBulletPool.size; i++) {
+        var bullet = game.enemyBulletPool.pool[i];
+        if (bullet.isInUse){
+            if (testCollision(
+                game.ship.x, game.ship.y, PLAYER_WIDTH, PLAYER_HEIGHT, bullet.x, bullet.y))
+            {
+                bullet.context.clearRect(bullet.x + BULLET_WIDTH/2, bullet.y + BULLET_HEIGHT/2, BULLET_WIDTH, BULLET_HEIGHT);
+                game.lives = game.lives - 1;
+                bullet.clear();
+                game.enemyBulletPool.pool.push((game.enemyBulletPool.pool.splice(i, 1))[0]);
+            }
+        }  
+    }
+    // Check collision between the player and enemies
+    for (var i = 0; i < game.enemies.maxEnemies; i++) {
+        var enemy = game.enemies.enemies[i];
+        if (enemy.enemyType != ENEMY_TYPE.NONE){
+            if (testCollision(
+                game.ship.x, game.ship.y, PLAYER_WIDTH, PLAYER_HEIGHT, enemy.x, enemy.y))
+            {
+                enemy.context.clearRect(enemy.x + enemy.width/2, enemy.y + enemy.height/2, enemy.width, enemy.height);
+                game.lives = game.lives - 1;
+                game.enemies.enemies[i].clean();
+                game.enemies.enemies.push((game.enemies.enemies.splice(i,1))[0]);
+            }
+        }  
+    }
+    
 };
 
 function testCollision(playerX, playerY, playerWidth, playerHeight, ballX, ballY)

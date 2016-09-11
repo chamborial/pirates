@@ -7,41 +7,41 @@ const BULLET_HEIGHT = 10
 
     // Pool object - reuses old objects instead of creating & deleting new ones. (Reduces lag)
 function Pool(maxsize) {
-    var size = maxsize; // The maximum number of bullets allowed
-    var pool = [];
+    this.size = maxsize; // The maximum number of bullets allowed
+    this.pool = [];
 
     this.init = function(object) {
         if (object === "cball") {
-            for (var i = 0; i < size; i++) {
+            for (var i = 0; i < this.size; i++) {
                 // Initalize the object
                 var cball = new Cball("cball");
                 cball.init(0,0, images.cball.width, images.cball.height);
-                pool[i] = cball;
+                this.pool[i] = cball;
             }
         }
         else if (object === "eball") {
-            for (var i = 0; i < size; i++) {
+            for (var i = 0; i < this.size; i++) {
                 var cball = new Cball("eball");
                 cball.init(0,0, images.eball.width, images.eball.height);
-                pool[i] = cball;
+                this.pool[i] = cball;
             }
         }
     };
 
     // Gets the last item in the list, initialises it then pushes to start of array
     this.getBall = function (x, y, speed) {
-        if (!pool[size - 1].isInUse) {
-            pool[size - 1].spawn(x, y, speed);
-            pool.unshift(pool.pop());
+        if (!this.pool[this.size - 1].isInUse) {
+            this.pool[this.size - 1].spawn(x, y, speed);
+            this.pool.unshift(this.pool.pop());
         }
     };
     // When a bullet moves out of view, clear it and move it to the start of the array
     this.animate = function () {
-        for (var i = 0; i < size; i++) {
-            if (pool[i].isInUse) {
-                if (pool[i].draw()) {
-                    pool[i].clear();
-                    pool.push((pool.splice(i, 1))[0]); // Splice adds new items while removing old
+        for (var i = 0; i < this.size; i++) {
+            if (this.pool[i].isInUse) {
+                if (this.pool[i].draw()) {
+                    this.pool[i].clear();
+                    this.pool.push((this.pool.splice(i, 1))[0]); // Splice adds new items while removing old
                 }
             }
             else

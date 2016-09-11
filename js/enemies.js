@@ -192,27 +192,27 @@ Enemy.prototype = new Drawable();
 // Keep an array of enemies so we don't have to repeatedly create new ones.
 // Living enemies are at the beginning of the list, unused enemies are kept at the end.
 function Enemies(maxEnemies) {
-    var maxEnemies;
-    var enemies = [];
+    this.maxEnemies = maxEnemies;
+    this.enemies = [];
 
     this.init = function() {
-        for (var i = 0; i < maxEnemies; i++) {
+        for (var i = 0; i < this.maxEnemies; i++) {
             var enemy = new Enemy();
             enemy.init(0, 0, 0, 0, ENEMY_TYPE.NONE, 0);
-            enemies[i] = enemy;
+            this.enemies[i] = enemy;
         }
     }
 
     this.draw = function() {
         // Iterate through each living enemy, calling their draw function
-        for (var i = 0; i < maxEnemies; i++) {
-            if (enemies[i].enemyType != ENEMY_TYPE.NONE) {
-                enemies[i].draw();
+        for (var i = 0; i < this.maxEnemies; i++) {
+            if (this.enemies[i].enemyType != ENEMY_TYPE.NONE) {
+                this.enemies[i].draw();
                 // If the draw function caused the enemy to move to the "dead" state,
                 // Move the dead enemy's object to the end of the array so it can be easily found and re-used
-                if (enemies[i].state === ENEMY_STATE.DEAD) {
-                    enemies[i].clean();
-                    enemies.push((enemies.splice(i,1))[0]);
+                if (this.enemies[i].state === ENEMY_STATE.DEAD) {
+                    this.enemies[i].clean();
+                    this.enemies.push((this.enemies.splice(i,1))[0]);
                 }
             } else {
                 // Since the living enemies are all at the start of the array, we don't need to iterate through the rest.
@@ -222,8 +222,8 @@ function Enemies(maxEnemies) {
     }
 
     this.spawn = function(x, y, enemyType, speed) {
-        if (enemies[maxEnemies-1].enemyType === ENEMY_TYPE.NONE) {
-            var newEnemy = enemies.pop();
+        if (this.enemies[this.maxEnemies-1].enemyType === ENEMY_TYPE.NONE) {
+            var newEnemy = this.enemies.pop();
             // Initialise the enemy with the correct enemy type.
             switch (enemyType) {
                 case ENEMY_TYPE.DUCK:
@@ -241,18 +241,18 @@ function Enemies(maxEnemies) {
                 default:
                     // Put that thing back where it came from, or so help me!
                     // (so we don't lose things from the list)
-                    enemies.push(newEnemy);
+                    this.enemies.push(newEnemy);
             }
             // Bring the enemy at the end of the array to the front, so it's not with the dead enemies any more.
-            enemies.unshift(newEnemy);
+            this.enemies.unshift(newEnemy);
         }
     }
 
     this.areAllDead = function() {
-        return enemies[0].enemyType === ENEMY_TYPE.NONE;
+        return this.enemies[0].enemyType === ENEMY_TYPE.NONE;
     }
 
     this.getEnemies = function() {
-        return enemies;
+        return this.enemies;
     }
 }
