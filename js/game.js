@@ -169,7 +169,7 @@ function Game() {
             /*this.ship.init(shipStartX, shipStartY, images.playerShip.width,
                            images.playerShip.height);*/
 
-            this.ship.init(20, 20, 233,
+            this.ship.init(100, 310, 233,
                            100);
 
             this.enemyBulletPool = new Pool(50);
@@ -399,11 +399,13 @@ function playerHit() {
                     bullet.context.clearRect(bullet.x, bullet.y, BULLET_WIDTH, BULLET_HEIGHT);
                     game.lives = game.lives - 1;
                     game.ship.invincibilityTimer = 150;
+                    // Destroy bullets that hit you
                     bullet.clear();
                     game.enemyBulletPool.pool.push((game.enemyBulletPool.pool.splice(i, 1))[0]);
                 }
             }
         } else {
+            // As unused bullets are kept together at the end of the pool, we can stop once we find the first one
             break;
         }
     }
@@ -416,15 +418,13 @@ function playerHit() {
                     enemy.context.clearRect(enemy.x, enemy.y, enemy.width, enemy.height);
                     game.lives = game.lives - 1;
                     game.ship.invincibilityTimer = 150;
+                    // Kill the enemy when you crash into them!
                     enemy.state = ENEMY_STATE.DYING;
                     enemy.timer = 0;
-                    // game.enemies.enemies[i].clean();
-                    // game.enemies.enemies.push((game.enemies.enemies.splice(i,1))[0]);
-                } else {
-                    console.log(game.ship.invincibilityTimer);
                 }
             }
         } else {
+            // As unused enemies are kept together at the end of the pool, we can stop once we find the first one
             break;
         }
     }
@@ -433,25 +433,33 @@ function playerHit() {
 function enemyHit() {
     for (var i = 0; i < game.enemies.maxEnemies; i++) {
         var enemy = game.enemies.enemies[i];
+        // Don't do collision with unused enemies
         if ((enemy.enemyType != ENEMY_TYPE.NONE)) {
-            for (var j = 0; j < game.ship.ballPool.size; j++) {
-                var bullet = game.ship.ballPool.pool[j];
-                if (bullet.isInUse) {
-                    if (testCollision(enemy.x, enemy.y, enemy.width, enemy.height, bullet.x, bullet.y)) {
-                        enemy.hp = enemy.hp - 1;
-                        if ((enemy.hp <= 0) && (enemy.state != ENEMY_STATE.DYING)) {
-                            enemy.state = ENEMY_STATE.DYING;
-                            enemy.timer = 0;
+            // Don't do collision with dying enemies
+            if (enemy.state != ENEMY_STATE.DYING) {
+                for (var j = 0; j < game.ship.ballPool.size; j++) {
+                    var bullet = game.ship.ballPool.pool[j];
+                    if (bullet.isInUse) {
+                        if (testCollision(enemy.x, enemy.y, enemy.width, enemy.height, bullet.x, bullet.y)) {
+                            enemy.hp = enemy.hp - 1;
+                            if (enemy.hp <= 0) {
+                                // Kill the enemy when their HP reaches 0
+                                enemy.state = ENEMY_STATE.DYING;
+                                enemy.timer = 0;
+                            }
+                            // Clear out the bullet graphic
+                            bullet.context.clearRect(bullet.x, bullet.y, BULLET_WIDTH, BULLET_HEIGHT);
+                            bullet.clear();
+                            game.ship.ballPool.pool.push((game.ship.ballPool.pool.splice(j, 1))[0]);
                         }
-                        bullet.context.clearRect(bullet.x, bullet.y, BULLET_WIDTH, BULLET_HEIGHT);
-                        bullet.clear();
-                        game.ship.ballPool.pool.push((game.ship.ballPool.pool.splice(j, 1))[0]);
+                    } else {
+                        // As unused bullets are kept together at the end of the pool, we can stop once we find the first one
+                        break;
                     }
-                } else {
-                    break;
                 }
             }
         } else {
+            // As unused enemies are kept together at the end of the pool, we can stop once we find the first one
             break;
         }
     }
