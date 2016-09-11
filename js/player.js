@@ -110,7 +110,7 @@ function Ship() {
     };
     // FIRE!!!!!!!!!!!
     this.fire = function () {
-        this.ballPool.getBall(this.x+6, this.y, 3);
+        this.ballPool.getBall(this.x+6, this.y, 4);
     };
 }
 Ship.prototype = new Drawable();
