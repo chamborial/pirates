@@ -96,12 +96,16 @@ function Ship() {
     this.speed = 5;
     this.ballPool = new Pool(15);
     this.ballPool.init("cball");
+    this.invincibilityTimer = 0;
     var counter = 0;
     this.draw = function () {
         this.context.drawImage(images.playerShip, this.x, this.y, PLAYER_WIDTH, PLAYER_HEIGHT);
     };
     this.move = function () {
         counter++;
+        if (this.invincibilityTimer > 0) {
+            this.invincibilityTimer = this.invincibilityTimer - 1;
+        }
         // Capture keys related to movement
         if (KEY_STATUS.left || KEY_STATUS.right || KEY_STATUS.down || KEY_STATUS.up) {
             // Erase current image as movement has been requested
@@ -132,7 +136,10 @@ function Ship() {
                 }
             }
             // Re draw the player ship
-            this.draw();
+            // Cause the player ship to flash if they're invincible
+            if (this.invincibilityTimer % 20 <= 10) {
+                this.draw();
+            }
         }
         // If space call fire
         if (KEY_STATUS.space && counter >= PLAYER_FIRE_RATE) {

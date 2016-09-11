@@ -233,24 +233,24 @@ function Game() {
         switch (this.wave++) {
             case 0:
                 // Spawn the enemies for the first wave
-                this.enemies.spawn(1340, 95, ENEMY_TYPE.DUCK, 2, 3);
-                this.enemies.spawn(1340, 335, ENEMY_TYPE.DUCK, 2, 3);
-                this.enemies.spawn(1340, 575, ENEMY_TYPE.DUCK, 2, 3);
-                this.enemies.spawn(1260, 215, ENEMY_TYPE.DUCK, 2, 3);
-                this.enemies.spawn(1260, 455, ENEMY_TYPE.DUCK, 2, 3);
-                this.enemies.spawn(1180, 335, ENEMY_TYPE.DUCK, 2, 3);
+                this.enemies.spawn(1340, 95, ENEMY_TYPE.DUCK, 2, 2);
+                this.enemies.spawn(1340, 335, ENEMY_TYPE.DUCK, 2, 2);
+                this.enemies.spawn(1340, 575, ENEMY_TYPE.DUCK, 2, 2);
+                this.enemies.spawn(1260, 215, ENEMY_TYPE.DUCK, 2, 2);
+                this.enemies.spawn(1260, 455, ENEMY_TYPE.DUCK, 2, 2);
+                this.enemies.spawn(1180, 335, ENEMY_TYPE.DUCK, 2, 2);
                 break;
             case 1:
                 // Spawn the enemies for the second wave
-                this.enemies.spawn(1180, 335, ENEMY_TYPE.SHIP, 2, 5);
-                this.enemies.spawn(1340, 95, ENEMY_TYPE.SHIP, 2, 5);
-                this.enemies.spawn(1340, 575, ENEMY_TYPE.SHIP, 2, 5);
+                this.enemies.spawn(1180, 335, ENEMY_TYPE.SHIP, 2, 4);
+                this.enemies.spawn(1340, 95, ENEMY_TYPE.SHIP, 2, 4);
+                this.enemies.spawn(1340, 575, ENEMY_TYPE.SHIP, 2, 4);
                 break;
             case 2:
                 // Spawn the enemies for the third wave
-                this.enemies.spawn(1180, 335, ENEMY_TYPE.SHIP, 3, 5);
-                this.enemies.spawn(1340, 95, ENEMY_TYPE.SHIP, 3, 5);
-                this.enemies.spawn(1340, 575, ENEMY_TYPE.SHIP, 3, 5);
+                this.enemies.spawn(1180, 335, ENEMY_TYPE.SHIP, 3, 4);
+                this.enemies.spawn(1340, 95, ENEMY_TYPE.SHIP, 3, 4);
+                this.enemies.spawn(1340, 575, ENEMY_TYPE.SHIP, 3, 4);
                 this.enemies.spawn(1500, 95, ENEMY_TYPE.ROCK, 2, 10000);
                 this.enemies.spawn(1700, 575, ENEMY_TYPE.ROCK, 2, 10000);
                 this.enemies.spawn(1600, 340, ENEMY_TYPE.ROCK, 2, 10000);
@@ -331,6 +331,7 @@ function doGameFrame() {
     if(game.lives <= 0){
         game.state = GAME_STATE.GAME_OVER;
     }
+    game.ship.invincibilityTimer = game.ship.invincibilityTimer - 1;
 }
 
 function doPausedFrame() {
@@ -394,10 +395,13 @@ function playerHit() {
         var bullet = game.enemyBulletPool.pool[i];
         if (bullet.isInUse) {
             if (testCollision(game.ship.x, game.ship.y, PLAYER_WIDTH, PLAYER_HEIGHT, bullet.x + BULLET_WIDTH/2, bullet.y + BULLET_HEIGHT/2)) {
-                bullet.context.clearRect(bullet.x, bullet.y, BULLET_WIDTH, BULLET_HEIGHT);
-                game.lives = game.lives - 1;
-                bullet.clear();
-                game.enemyBulletPool.pool.push((game.enemyBulletPool.pool.splice(i, 1))[0]);
+                if (game.ship.invincibilityTimer <= 0) {
+                    bullet.context.clearRect(bullet.x, bullet.y, BULLET_WIDTH, BULLET_HEIGHT);
+                    game.lives = game.lives - 1;
+                    game.ship.invincibilityTimer = 150;
+                    bullet.clear();
+                    game.enemyBulletPool.pool.push((game.enemyBulletPool.pool.splice(i, 1))[0]);
+                }
             }
         } else {
             break;
@@ -408,10 +412,15 @@ function playerHit() {
         var enemy = game.enemies.enemies[i];
         if (enemy.enemyType != ENEMY_TYPE.NONE){
             if (testCollision(game.ship.x, game.ship.y, PLAYER_WIDTH, PLAYER_HEIGHT, enemy.x + enemy.width/2, enemy.y + enemy.height/2)) {
-                enemy.context.clearRect(enemy.x, enemy.y, enemy.width, enemy.height);
-                game.lives = game.lives - 1;
-                game.enemies.enemies[i].clean();
-                game.enemies.enemies.push((game.enemies.enemies.splice(i,1))[0]);
+                if (game.ship.invincibilityTimer <= 0) {
+                    enemy.context.clearRect(enemy.x, enemy.y, enemy.width, enemy.height);
+                    game.lives = game.lives - 1;
+                    game.ship.invincibilityTimer = 150;
+                    game.enemies.enemies[i].clean();
+                    game.enemies.enemies.push((game.enemies.enemies.splice(i,1))[0]);
+                } else {
+                    console.log(game.ship.invincibilityTimer);
+                }
             }
         } else {
             break;
