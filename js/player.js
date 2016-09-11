@@ -11,7 +11,7 @@ function Pool(maxsize) {
     var pool = [];
 
     this.init = function(object) {
-        if (object == "cball") {
+        if (object === "cball") {
             for (var i = 0; i < size; i++) {
                 // Initalize the object
                 var cball = new Cball("cball");
@@ -19,7 +19,7 @@ function Pool(maxsize) {
                 pool[i] = cball;
             }
         }
-        else if (object == "eball") {
+        else if (object === "eball") {
             for (var i = 0; i < size; i++) {
                 var cball = new Cball("eball");
                 cball.init(0,0, images.eball.width, images.eball.height);
@@ -111,8 +111,9 @@ function Ship() {
             // The nested if statements ensures that the player cannot move off the screen
             if (KEY_STATUS.left) {
                 this.x -= this.speed
-                if (this.x <= 0)
+                if (this.x <= 0) {
                     this.x = 0;
+                }
             }
             if (KEY_STATUS.right) {
                 this.x += this.speed
@@ -120,11 +121,15 @@ function Ship() {
             }
             if (KEY_STATUS.up) {
                 this.y -= this.speed
-                if (this.y <= 0) this.y = 0;
+                if (this.y <= 0) {
+                    this.y = 0;
+                }
             }
             if (KEY_STATUS.down) {
                 this.y += this.speed
-                if (this.y >= this.canvasHeight - PLAYER_HEIGHT) this.y = this.canvasHeight - PLAYER_HEIGHT;
+                if (this.y >= this.canvasHeight - PLAYER_HEIGHT) {
+                    this.y = this.canvasHeight - PLAYER_HEIGHT;
+                }
             }
             // Re draw the player ship
             this.draw();
