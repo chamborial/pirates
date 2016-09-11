@@ -32,13 +32,14 @@ function Enemy() {
     this.state = ENEMY_STATE.DEAD;
     this.enemyType = ENEMY_TYPE.NONE;
 
-    this.init = function(x, y, width, height, type, speed) {
+    this.init = function(x, y, width, height, type, speed, hp) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.enemyType = type;
         this.speed = speed;
+        this.hp = hp;
         switch (type) {
             case ENEMY_TYPE.NONE:
                 this.state = ENEMY_STATE.DEAD;
@@ -67,11 +68,9 @@ function Enemy() {
                 if (this.timer >= 200) {
                     // If the enemy is a duck, stop moving.
                     if (this.enemyType === ENEMY_TYPE.DUCK) {
-                       // this.state = ENEMY_STATE.STATIONARY;
-                        this.state = ENEMY_STATE.DYING;
+                        this.state = ENEMY_STATE.STATIONARY;
                     } else {
                         this.state = ENEMY_STATE.MOVE_UP;
-                      //  this.state = ENEMY_STATE.DYING;
                     }
                     // Start the enemy half-way through the move up/down cycle
                     this.timer = 50;
@@ -221,22 +220,22 @@ function Enemies(maxEnemies) {
         }
     }
 
-    this.spawn = function(x, y, enemyType, speed) {
+    this.spawn = function(x, y, enemyType, speed, hp) {
         if (this.enemies[this.maxEnemies-1].enemyType === ENEMY_TYPE.NONE) {
             var newEnemy = this.enemies.pop();
             // Initialise the enemy with the correct enemy type.
             switch (enemyType) {
                 case ENEMY_TYPE.DUCK:
-                    newEnemy.init(x, y, DUCK_WIDTH, DUCK_HEIGHT, enemyType, speed);
+                    newEnemy.init(x, y, DUCK_WIDTH, DUCK_HEIGHT, enemyType, speed, hp);
                     break;
                 case ENEMY_TYPE.SHIP:
-                    newEnemy.init(x, y, SHIP_WIDTH, SHIP_HEIGHT, enemyType, speed);
+                    newEnemy.init(x, y, SHIP_WIDTH, SHIP_HEIGHT, enemyType, speed, hp);
                     break;
                 case ENEMY_TYPE.ROCK:
-                    newEnemy.init(x, y, ROCK_WIDTH, ROCK_HEIGHT, enemyType, speed);
+                    newEnemy.init(x, y, ROCK_WIDTH, ROCK_HEIGHT, enemyType, speed, hp);
                     break;
                 case ENEMY_TYPE.CRAIG:
-                    newEnemy.init(x, y, CRAIG_WIDTH, CRAIG_HEIGHT, enemyType, speed);
+                    newEnemy.init(x, y, CRAIG_WIDTH, CRAIG_HEIGHT, enemyType, speed, hp);
                     break;
                 default:
                     // Put that thing back where it came from, or so help me!

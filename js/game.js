@@ -233,34 +233,34 @@ function Game() {
         switch (this.wave++) {
             case 0:
                 // Spawn the enemies for the first wave
-                this.enemies.spawn(1340, 95, ENEMY_TYPE.DUCK, 2);
-                this.enemies.spawn(1340, 335, ENEMY_TYPE.DUCK, 2);
-                this.enemies.spawn(1340, 575, ENEMY_TYPE.DUCK, 2);
-                this.enemies.spawn(1260, 215, ENEMY_TYPE.DUCK, 2);
-                this.enemies.spawn(1260, 455, ENEMY_TYPE.DUCK, 2);
-                this.enemies.spawn(1180, 335, ENEMY_TYPE.DUCK, 2);
+                this.enemies.spawn(1340, 95, ENEMY_TYPE.DUCK, 2, 3);
+                this.enemies.spawn(1340, 335, ENEMY_TYPE.DUCK, 2, 3);
+                this.enemies.spawn(1340, 575, ENEMY_TYPE.DUCK, 2, 3);
+                this.enemies.spawn(1260, 215, ENEMY_TYPE.DUCK, 2, 3);
+                this.enemies.spawn(1260, 455, ENEMY_TYPE.DUCK, 2, 3);
+                this.enemies.spawn(1180, 335, ENEMY_TYPE.DUCK, 2, 3);
                 break;
             case 1:
                 // Spawn the enemies for the second wave
-                this.enemies.spawn(1180, 335, ENEMY_TYPE.SHIP, 2);
-                this.enemies.spawn(1340, 95, ENEMY_TYPE.SHIP, 2);
-                this.enemies.spawn(1340, 575, ENEMY_TYPE.SHIP, 2);
+                this.enemies.spawn(1180, 335, ENEMY_TYPE.SHIP, 2, 5);
+                this.enemies.spawn(1340, 95, ENEMY_TYPE.SHIP, 2, 5);
+                this.enemies.spawn(1340, 575, ENEMY_TYPE.SHIP, 2, 5);
                 break;
             case 2:
                 // Spawn the enemies for the third wave
-                this.enemies.spawn(1180, 335, ENEMY_TYPE.SHIP, 3);
-                this.enemies.spawn(1340, 95, ENEMY_TYPE.SHIP, 3);
-                this.enemies.spawn(1340, 575, ENEMY_TYPE.SHIP, 3);
-                this.enemies.spawn(1500, 95, ENEMY_TYPE.ROCK, 2);
-                this.enemies.spawn(1700, 575, ENEMY_TYPE.ROCK, 2);
-                this.enemies.spawn(1600, 340, ENEMY_TYPE.ROCK, 2);
-                this.enemies.spawn(1750, 225, ENEMY_TYPE.ROCK, 2);
-                this.enemies.spawn(1800, 655, ENEMY_TYPE.ROCK, 2);
+                this.enemies.spawn(1180, 335, ENEMY_TYPE.SHIP, 3, 5);
+                this.enemies.spawn(1340, 95, ENEMY_TYPE.SHIP, 3, 5);
+                this.enemies.spawn(1340, 575, ENEMY_TYPE.SHIP, 3, 5);
+                this.enemies.spawn(1500, 95, ENEMY_TYPE.ROCK, 2, 10000);
+                this.enemies.spawn(1700, 575, ENEMY_TYPE.ROCK, 2, 10000);
+                this.enemies.spawn(1600, 340, ENEMY_TYPE.ROCK, 2, 10000);
+                this.enemies.spawn(1750, 225, ENEMY_TYPE.ROCK, 2, 10000);
+                this.enemies.spawn(1800, 655, ENEMY_TYPE.ROCK, 2, 10000);
                 break;
             case 3:
                 // Spawn the enemies for the final wave
                 this.bossApproachTimer = 450;
-                this.enemies.spawn(1080, 252, ENEMY_TYPE.CRAIG, 2);
+                this.enemies.spawn(1080, 252, ENEMY_TYPE.CRAIG, 2, 50);
                 break;
             case 4:
                 // Show the victory screen!
@@ -312,6 +312,7 @@ function doGameFrame() {
     game.ship.ballPool.animate();
     game.enemyBulletPool.animate();
     playerHit();
+    enemyHit();
     game.drawHud();
     // Begin the next wave if the last one has been cleared
     if (game.enemies.areAllDead()) {
@@ -391,11 +392,9 @@ function playerHit() {
     // Check collision between the player and bullets
     for (var i = 0; i < game.enemyBulletPool.size; i++) {
         var bullet = game.enemyBulletPool.pool[i];
-        if (bullet.isInUse){
-            if (testCollision(
-                game.ship.x, game.ship.y, PLAYER_WIDTH, PLAYER_HEIGHT, bullet.x, bullet.y))
-            {
-                bullet.context.clearRect(bullet.x + BULLET_WIDTH/2, bullet.y + BULLET_HEIGHT/2, BULLET_WIDTH, BULLET_HEIGHT);
+        if (bullet.isInUse) {
+            if (testCollision(game.ship.x, game.ship.y, PLAYER_WIDTH, PLAYER_HEIGHT, bullet.x + BULLET_WIDTH/2, bullet.y + BULLET_HEIGHT/2)) {
+                bullet.context.clearRect(bullet.x, bullet.y, BULLET_WIDTH, BULLET_HEIGHT);
                 game.lives = game.lives - 1;
                 bullet.clear();
                 game.enemyBulletPool.pool.push((game.enemyBulletPool.pool.splice(i, 1))[0]);
@@ -406,26 +405,52 @@ function playerHit() {
     for (var i = 0; i < game.enemies.maxEnemies; i++) {
         var enemy = game.enemies.enemies[i];
         if (enemy.enemyType != ENEMY_TYPE.NONE){
-            if (testCollision(
-                game.ship.x, game.ship.y, PLAYER_WIDTH, PLAYER_HEIGHT, enemy.x, enemy.y))
-            {
-                enemy.context.clearRect(enemy.x + enemy.width/2, enemy.y + enemy.height/2, enemy.width, enemy.height);
+            if (testCollision(game.ship.x, game.ship.y, PLAYER_WIDTH, PLAYER_HEIGHT, enemy.x + enemy.width/2, enemy.y + enemy.height/2)) {
+                enemy.context.clearRect(enemy.x, enemy.y, enemy.width, enemy.height);
                 game.lives = game.lives - 1;
                 game.enemies.enemies[i].clean();
                 game.enemies.enemies.push((game.enemies.enemies.splice(i,1))[0]);
             }
         }  
     }
-    
 };
 
-function testCollision(playerX, playerY, playerWidth, playerHeight, ballX, ballY)
+function enemyHit() {
+    for (var i = 0; i < game.enemies.maxEnemies; i++) {
+        var enemy = game.enemies.enemies[i];
+        console.log(enemy);
+        if ((enemy.enemyType != ENEMY_TYPE.NONE)) {
+            for (var j = 0; j < game.ship.ballPool.size; j++) {
+                var bullet = game.ship.ballPool.pool[j];
+                console.log(bullet);
+                if (bullet.isInUse) {
+                    if (testCollision(enemy.x, enemy.y, enemy.width, enemy.height, bullet.x, bullet.y)) {
+                        enemy.hp = enemy.hp - 1;
+                        if ((enemy.hp <= 0) && (enemy.state != ENEMY_STATE.DYING)) {
+                            enemy.state = ENEMY_STATE.DYING;
+                            enemy.timer = 0;
+                        }
+                        bullet.context.clearRect(bullet.x, bullet.y, BULLET_WIDTH, BULLET_HEIGHT);
+                        bullet.clear();
+                        game.ship.ballPool.pool.push((game.ship.ballPool.pool.splice(i, 1))[0]);
+                    }
+                } else {
+                    break;
+                }
+            }
+        } else {
+            break;
+        }
+    }
+}
+
+function testCollision(objectX, objectY, objectWidth, objectHeight, ballX, ballY)
 {
     //x1, y1 = x and y coordinates of object 1
     //w1, h1 = width and height of object 1
     //x2, y2 = x and y coordinates of object 2 (usually midpt)
-    if ((playerX <= ballX && playerX+playerWidth >= ballX) &&
-        (playerY <= ballY && playerY+playerHeight >= ballY))
+    if ((objectX <= ballX && objectX+objectWidth >= ballX) &&
+        (objectY <= ballY && objectY+objectHeight >= ballY))
             return true;
     else
         return false;
