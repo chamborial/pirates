@@ -10,7 +10,7 @@ function Pool(maxsize) {
     var size = maxsize; // The maximum number of bullets allowed
     var pool = [];
 
-this.init = function(object) {
+    this.init = function(object) {
         if (object == "cball") {
             for (var i = 0; i < size; i++) {
                 // Initalize the object
@@ -63,7 +63,7 @@ this.init = function(object) {
 
 function Cball(Object) {
     this.isInUse = false; // The bullet is not in use as it has just been created
-    var self = Object;
+    this.self = Object;
 
     this.spawn = function (x, y, speed) {
         this.x = x;
@@ -84,17 +84,17 @@ function Cball(Object) {
         // }
 
 
-        if (self === "cball" && this.x <= 0 - this.height) {
+        if (this.self === "cball" && this.x <= 0 - this.width) {
             return true;
         }
-        else if (self === "eball" && this.x >= this.canvasHeight) {
+        else if (this.self === "eball" && this.x >= this.canvasWidth) {
             return true;
         }
         else {
-            if (self === "cball") {
+            if (this.self === "cball") {
                 this.context.drawImage(images.cball, this.x, this.y, BULLET_HEIGHT, BULLET_WIDTH);
             }
-            else if (self === "eball") {
+            else if (this.self === "eball") {
                 this.context.drawImage(images.eball, this.x, this.y, BULLET_HEIGHT, BULLET_WIDTH);
             }
             return false;
