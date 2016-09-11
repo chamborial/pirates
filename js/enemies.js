@@ -232,7 +232,17 @@ function Enemy() {
     }
 
     this.enemyFire = function() {
-        game.enemyBulletPool.getBall(this.x - BULLET_WIDTH, this.y + this.height/2 - BULLET_HEIGHT/2, -2.5);
+        
+         switch (this.enemyType) {
+                case ENEMY_TYPE.CRAIG:
+                 
+                 for (i = 0; i < Math.floor(Math.random() * 50) + 1; i++) { 
+                    game.enemyBulletPool.getBall(this.x, this.y + this.height/Math.floor(Math.random() * 30) + 1  , Math.floor(Math.random() * -50) + -1);
+                 }
+                    break;
+             default:
+                  game.enemyBulletPool.getBall(this.x - BULLET_WIDTH, this.y + this.height/2 - BULLET_HEIGHT/2, -2.5);
+            }
     }
 
                     //If space call fire
