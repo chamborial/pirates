@@ -399,7 +399,9 @@ function playerHit() {
                 bullet.clear();
                 game.enemyBulletPool.pool.push((game.enemyBulletPool.pool.splice(i, 1))[0]);
             }
-        }  
+        } else {
+            break;
+        }
     }
     // Check collision between the player and enemies
     for (var i = 0; i < game.enemies.maxEnemies; i++) {
@@ -411,18 +413,18 @@ function playerHit() {
                 game.enemies.enemies[i].clean();
                 game.enemies.enemies.push((game.enemies.enemies.splice(i,1))[0]);
             }
-        }  
+        } else {
+            break;
+        }
     }
 };
 
 function enemyHit() {
     for (var i = 0; i < game.enemies.maxEnemies; i++) {
         var enemy = game.enemies.enemies[i];
-        console.log(enemy);
         if ((enemy.enemyType != ENEMY_TYPE.NONE)) {
             for (var j = 0; j < game.ship.ballPool.size; j++) {
                 var bullet = game.ship.ballPool.pool[j];
-                console.log(bullet);
                 if (bullet.isInUse) {
                     if (testCollision(enemy.x, enemy.y, enemy.width, enemy.height, bullet.x, bullet.y)) {
                         enemy.hp = enemy.hp - 1;
