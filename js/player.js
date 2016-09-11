@@ -105,11 +105,14 @@ function Ship() {
         counter++;
         if (this.invincibilityTimer > 0) {
             this.invincibilityTimer = this.invincibilityTimer - 1;
+            this.context.clearRect(this.x, this.y, PLAYER_WIDTH, PLAYER_HEIGHT);
         }
         // Capture keys related to movement
         if (KEY_STATUS.left || KEY_STATUS.right || KEY_STATUS.down || KEY_STATUS.up) {
             // Erase current image as movement has been requested
-            this.context.clearRect(this.x, this.y, PLAYER_WIDTH, PLAYER_HEIGHT);
+            if (this.invincibilityTimer <= 0) {
+                this.context.clearRect(this.x, this.y, PLAYER_WIDTH, PLAYER_HEIGHT);
+            }
 
             // Moves the player in various directions by altering the x & y values in correspondence with the speed
             // The nested if statements ensures that the player cannot move off the screen
@@ -135,11 +138,14 @@ function Ship() {
                     this.y = this.canvasHeight - PLAYER_HEIGHT;
                 }
             }
-            // Re draw the player ship
-            // Cause the player ship to flash if they're invincible
-            if (this.invincibilityTimer % 20 <= 10) {
+            // Re draw the player ship. This is handled later if the player's ship is invincible.
+            if (this.invincibilityTimer <= 0) {
                 this.draw();
             }
+        }
+        // If the player is invincible, we need to draw them for 10 out of every 20 frames
+        if ((this.invincibilityTimer > 0) && (this.invincibilityTimer % 20 >= 10)) {
+            this.draw();
         }
         // If space call fire
         if (KEY_STATUS.space && counter >= PLAYER_FIRE_RATE) {

@@ -416,8 +416,10 @@ function playerHit() {
                     enemy.context.clearRect(enemy.x, enemy.y, enemy.width, enemy.height);
                     game.lives = game.lives - 1;
                     game.ship.invincibilityTimer = 150;
-                    game.enemies.enemies[i].clean();
-                    game.enemies.enemies.push((game.enemies.enemies.splice(i,1))[0]);
+                    enemy.state = ENEMY_STATE.DYING;
+                    enemy.timer = 0;
+                    // game.enemies.enemies[i].clean();
+                    // game.enemies.enemies.push((game.enemies.enemies.splice(i,1))[0]);
                 } else {
                     console.log(game.ship.invincibilityTimer);
                 }
