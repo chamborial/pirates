@@ -173,7 +173,7 @@ function Ship() {
     };
     // FIRE!!!!!!!!!!!
     this.fire = function () {
-        this.ballPool.getBall(this.x+6, this.y, 4);
+        this.ballPool.getBall(this.x+PLAYER_WIDTH - BULLET_WIDTH/2, this.y+PLAYER_HEIGHT/2 - BULLET_HEIGHT/2, 4);
     };
 }
 Ship.prototype = new Drawable();

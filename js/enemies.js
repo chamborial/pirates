@@ -223,14 +223,14 @@ function Enemy() {
             }
         }
 
-         chance = Math.floor(Math.random()*101);
-        if (chance/100 < percentFire) {
+        chance = Math.floor(Math.random()*101);
+        if (chance < percentFire) {
             this.enemyFire();
         }
     };
 
-        this.enemyFire = function() {
-        game.enemyBulletPool.getBall(this.x+this.width/2, this.y+this.height, -2.5);
+    this.enemyFire = function() {
+        game.enemyBulletPool.getBall(this.x, this.y + this.width/2, -2.5);
     }
 
                     //If space call fire
