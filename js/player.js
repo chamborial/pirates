@@ -73,7 +73,7 @@ function Cball(Object) {
     };
     // Use 'dirty rectangle' technique to clear only the area around the bullet
     this.draw = function () {
-        this.context.clearRect(this.x-1, this.y-1, this.width+1, this.height+1);
+        this.context.clearRect(this.x, this.y, BULLET_WIDTH, BULLET_HEIGHT);
         this.x += this.speed;
         // If bullet moves of the screen - return true
         // if (this.x <= 0 - this.width) {
@@ -82,7 +82,6 @@ function Cball(Object) {
         // else {
         //     this.context.drawImage(images.cball, this.x, this.y); // Draw the bullet
         // }
-
 
         if (this.self === "cball" && this.x <= 0 - this.width) {
             return true;
