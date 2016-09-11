@@ -2,6 +2,8 @@
 const PLAYER_WIDTH = 140
 const PLAYER_HEIGHT = 80
 const PLAYER_FIRE_RATE = 15
+const BULLET_WIDTH = 10
+const BULLET_HEIGHT = 10
 
     // Pool object - reuses old objects instead of creating & deleting new ones. (Reduces lag)
 function Pool(maxsize) {
@@ -90,10 +92,10 @@ function Cball(Object) {
         }
         else {
             if (self === "cball") {
-                this.context.drawImage(images.cball, this.x, this.y);
+                this.context.drawImage(images.cball, this.x, this.y, BULLET_HEIGHT, BULLET_WIDTH);
             }
             else if (self === "eball") {
-                this.context.drawImage(images.eball, this.x, this.y);
+                this.context.drawImage(images.eball, this.x, this.y, BULLET_HEIGHT, BULLET_WIDTH);
             }
             return false;
         }
