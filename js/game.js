@@ -432,7 +432,7 @@ function enemyHit() {
                         }
                         bullet.context.clearRect(bullet.x, bullet.y, BULLET_WIDTH, BULLET_HEIGHT);
                         bullet.clear();
-                        game.ship.ballPool.pool.push((game.ship.ballPool.pool.splice(i, 1))[0]);
+                        game.ship.ballPool.pool.push((game.ship.ballPool.pool.splice(j, 1))[0]);
                     }
                 } else {
                     break;

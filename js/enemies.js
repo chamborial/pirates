@@ -122,8 +122,7 @@ function Enemy() {
                 break;
             case ENEMY_STATE.DYING:
                 // Display an explosion graphic for 30 frames
-                if (this.timer <= 60) {
-                    // TODO: Display the explosion graphic
+                if (this.timer <= 30) {
                     this.context.drawImage(images.explosion, this.x, this.y, this.width, this.height);
                     this.timer += 1;
                 } else {
