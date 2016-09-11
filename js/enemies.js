@@ -94,9 +94,6 @@ function Enemy() {
     this.state = ENEMY_STATE.DEAD;
     this.enemyType = ENEMY_TYPE.NONE;
 
-    var percentFire = 1;
-    var chance = 0;
-
     // this.eBallPool = new EnemyBallPool(15);
     // this.eBallPool.init();
     // var fireRate = 15;
@@ -151,6 +148,7 @@ function Enemy() {
             case ENEMY_STATE.MOVE_UP:
                 // Move the ship up (speed) pixels per frame
                 this.y = this.y - this.speed;
+                this.attemptToFire(0.01);
                 // After 100 frames, start moving down
                 if (this.timer >= 100) {
                     this.state = ENEMY_STATE.MOVE_DOWN;
@@ -161,6 +159,8 @@ function Enemy() {
             case ENEMY_STATE.MOVE_DOWN:
                 // Move the ship down (speed) pixels per frame
                 this.y = this.y + this.speed;
+                this.attemptToFire(0.01);
+                // After 100 frames, start moving up
                 if (this.timer >= 100) {
                     this.state = ENEMY_STATE.MOVE_UP;
                     this.timer = 0;
@@ -222,15 +222,17 @@ function Enemy() {
                     break;
             }
         }
-
-        chance = Math.floor(Math.random()*101);
-        if (chance < percentFire) {
+    };
+    
+    this.attemptToFire = function(chance) {
+        var rand = Math.random();
+        if (rand <= chance) {
             this.enemyFire();
         }
-    };
+    }
 
     this.enemyFire = function() {
-        game.enemyBulletPool.getBall(this.x, this.y + this.height/2, -2.5);
+        game.enemyBulletPool.getBall(this.x - BULLET_WIDTH, this.y + this.height/2 - BULLET_HEIGHT/2, -2.5);
     }
 
                     //If space call fire
