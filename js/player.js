@@ -82,12 +82,11 @@ function Cball(Object) {
         // else {
         //     this.context.drawImage(images.cball, this.x, this.y); // Draw the bullet
         // }
-
-        if (this.self === "cball" && this.x <= 0 - this.width) {
-            return true;
+        if (this.self === "cball" && this.x >= this.canvasWidth) {
+            return isInUse = true;
         }
-        else if (this.self === "eball" && this.x >= this.canvasWidth) {
-            return true;
+        else if (this.self === "eball" && this.x <= 0 - this.canvasWidth) {
+            return isInUse = true;
         }
         else {
             if (this.self === "cball") {
@@ -96,7 +95,7 @@ function Cball(Object) {
             else if (this.self === "eball") {
                 this.context.drawImage(images.eball, this.x, this.y, BULLET_HEIGHT, BULLET_WIDTH);
             }
-            return false;
+            return isInUse = false;
         }
     };
 
