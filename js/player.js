@@ -7,7 +7,7 @@ function Pool(maxsize) {
     var pool = [];
     this.init = function () {
         for (var i = 0; i < size; i++) {
-            // Init cannon ball
+            // Initalize cannon ball
             var cball = new Cball();
             cball.init(0, 0, images.cball.width, images.cball.height);
             pool[i] = cball;
@@ -29,7 +29,8 @@ function Pool(maxsize) {
                     pool.push((pool.splice(i, 1))[0]); // Splice adds new items while removing old
                 }
             }
-            else break;
+            else
+                break;
         }
     };
 }
@@ -45,9 +46,9 @@ function Cball() {
     // Use 'dirty rectangle' technique to clear only the area around the bullet
     this.draw = function () {
         this.context.clearRect(this.x, this.y, this.width, this.height);
-        this.y -= this.speed;
+        this.x += this.speed;
         // If bullet moves of the screen - return true
-        if (this.y <= 0 - this.height) {
+        if (this.x <= 0 - this.width) {
             return true; // Bullet ready to be cleared by pool
         }
         else {
@@ -109,7 +110,7 @@ function Ship() {
     };
     // FIRE!!!!!!!!!!!
     this.fire = function () {
-        this.ballpool.getBall(this.x + 6, this.y, 3);
+        this.ballPool.getBall(this.x+6, this.y, 3);
     };
 }
 Ship.prototype = new Drawable();
