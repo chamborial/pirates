@@ -132,7 +132,13 @@ function Game() {
             this.playerContext  = this.playerCanvas.getContext('2d');
             this.gameContext    = this.gameCanvas.getContext('2d');
             this.hudContext     = this.hudCanvas.getContext('2d');
-
+            
+            // Clear each canvas so that the game starts with fresh canvases
+            this.bgContext.clearRect(0, 0, bgCanvas.width, bgCanvas.height)
+            this.playerContext.clearRect(0, 0, playerCanvas.width, playerCanvas.height)
+            this.gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height)
+            this.hudContext.clearRect(0, 0, hudCanvas.width, hudCanvas.height)
+            
             // Assign the correct context to each of the objects
             Background.prototype.context        = this.bgContext;
             Background.prototype.canvasWidth    = this.bgCanvas.width;
