@@ -1,7 +1,8 @@
 var GAME_STATE = Object.freeze({    TITLE:      0,
                                     PLAYING:    1,
                                     PAUSED:     2,
-                                    GAME_OVER:  3});
+                                    GAME_OVER:  3,
+                                    VICTORY:    4});
 
 // Create an object which will hold all of our graphics so we only have to load them once
 var images = new function() {
@@ -19,6 +20,7 @@ var images = new function() {
     this.paused         = new Image();
     this.logo           = new Image();
     this.gameOver       = new Image();
+    this.victory        = new Image();
 
 
     // Make sure all the required images are loaded before game start
@@ -33,19 +35,20 @@ var images = new function() {
         }
     }
     // Have the images call the imgloaded function when they finish loading
-    this.background.onload   = imgloaded;
-    this.playerShip.onload   = imgloaded;
-    this.enemyShip.onload    = imgloaded;
-    this.enemyDuck.onload    = imgloaded;
-    this.enemyRock.onload    = imgloaded;
-    this.enemyCraig.onload   = imgloaded;
-    this.craigWarning.onload = imgloaded;
-    this.explosion.onload    = imgloaded;
-    this.cball.onload        = imgloaded;
-    this.eball.onload        = imgloaded;
-    this.paused.onload       = imgloaded;
-    this.logo.onload         = imgloaded;
-    this.gameOver.onload     = imgloaded;
+    this.background.onload      = imgloaded;
+    this.playerShip.onload      = imgloaded;
+    this.enemyShip.onload       = imgloaded;
+    this.enemyDuck.onload       = imgloaded;
+    this.enemyRock.onload       = imgloaded;
+    this.enemyCraig.onload      = imgloaded;
+    this.craigWarning.onload    = imgloaded;
+    this.explosion.onload       = imgloaded;
+    this.cball.onload           = imgloaded;
+    this.eball.onload           = imgloaded;
+    this.paused.onload          = imgloaded;
+    this.logo.onload            = imgloaded;
+    this.gameOver.onload        = imgloaded;
+    this.victory.onload         = imgloaded;
 
     // Map our image objects to files
     this.background.src     = "img/waterTile.png";
@@ -61,6 +64,7 @@ var images = new function() {
     this.paused.src         = "img/paused.png";
     this.logo.src           = "img/skullAndCrossbones.png";
     this.gameOver.src       = "img/gameOver.png";
+    this.victory.src        = "img/victory.png";
 }
 
 // The base drawable object which all objects with graphics will inherit.
@@ -204,6 +208,11 @@ function Game() {
             case GAME_STATE.GAME_OVER:
                 this.hudContext.clearRect(0, 0, 1080, 720);
                 this.hudContext.drawImage(images.gameOver, (1080 - images.gameOver.width)/2, (720 - images.gameOver.height)/2, images.gameOver.width, images.gameOver.height);
+                break;
+            case GAME_STATE.VICTORY:
+                this.hudContext.clearRect(0, 0, 1080, 720);
+                this.hudContext.drawImage(images.victory, (1080 - images.victory.width)/2, (720 - images.victory.height)/2, images.victory.width, images.victory.height);
+                break;
             default:
         }
     }
@@ -251,6 +260,9 @@ function Game() {
                 this.bossApproachTimer = 450;
                 this.enemies.spawn(1080, 252, ENEMY_TYPE.CRAIG, 2);
                 break;
+            case 4:
+                // Show the victory screen!
+                this.state = GAME_STATE.VICTORY;
             default:
         }
         console.log("Spawned wave ", this.wave);
@@ -271,6 +283,9 @@ function doFrame() {
             break;
         case GAME_STATE.GAME_OVER:
             doGameOverFrame();
+            break;
+        case GAME_STATE.VICTORY:
+            doVictoryFrame();
             break;
         default:
     }
@@ -334,6 +349,16 @@ function doPausedFrame() {
 }
 
 function doGameOverFrame() {
+    game.background.draw();
+    game.drawHud();
+    if (KEY_STATUS.enter) {
+        if(game.init()) {
+            game.start();
+        }
+    }
+}
+
+function doVictoryFrame() {
     game.background.draw();
     game.drawHud();
     if (KEY_STATUS.enter) {
