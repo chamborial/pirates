@@ -16,6 +16,8 @@ function Pool(maxsize) {
                 // Initalize the object
                 var cball = new Cball("cball");
                 cball.init(0,0, images.cball.width, images.cball.height);
+                cball.collidableWith = "enemy";
+                cball.type = "cball";
                 pool[i] = cball;
             }
         }
@@ -23,10 +25,22 @@ function Pool(maxsize) {
             for (var i = 0; i < size; i++) {
                 var cball = new Cball("eball");
                 cball.init(0,0, images.eball.width, images.eball.height);
+                cball.collidableWith = "ship";
+                cball.type = "eball";
                 pool[i] = cball;
             }
         }
     };
+
+    this.getPool = function() {
+        var obj = [];
+        for (var i = 0; i < size; i++) {
+            if (pool[i].alive) {
+                obj.push(pool[i]);
+            }
+        }
+        return obj;
+    }
 
     // Gets the last item in the list, initialises it then pushes to start of array
     this.getBall = function (x, y, speed) {
@@ -133,7 +147,7 @@ function Ship() {
                 if (this.y >= this.canvasHeight - this.height) this.y = this.canvasHeight - this.height;
             }
             // Re draw the player ship
-            if(!collision){
+            if(!this.collision){
             this.draw();
             }
         }

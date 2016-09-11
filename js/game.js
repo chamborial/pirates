@@ -177,6 +177,9 @@ function Game() {
             this.enemyBulletPool = new Pool(50);
             this.enemyBulletPool.init("eball");
 
+            // Start QuadTree
+            this.quadTree = new QuadTree({x:0,y:0,width:this.gameCanvas.width,height:this.gameCanvas.height});
+
             return true;
         } else {
             return false;
@@ -292,6 +295,13 @@ function doTitleFrame() {
 }
 
 function doGameFrame() {
+    // Insert objects into quadtree
+    game.quadTree.clear();
+    game.quadTree.insert(game.ship);
+    game.quadTree.insert(game.ship.ballPool.getPool());
+    game.quadTree.insert(game.enemyBulletPool.getPool());
+    detectCollision();
+
     // Update the game state for each of the objects
     game.background.draw();
     game.enemies.draw();
@@ -353,6 +363,28 @@ function init() {
         game.start();
     }
 }
+
+
+function detectCollision() {
+    var objects = [];
+    game.quadTree.getAllObjects(objects);
+    for (var x = 0, len = objects.length; x < len; x++) {
+        game.quadTree.findObjects(obj = [], objects[x]);
+
+        for (y = 0, length = obj.length; y < length; y++) {
+
+            // DETECT COLLISION ALGORITHM
+            if (objects[x].collidableWith === obj[y].type &&
+                (objects[x].x < obj[y].x + obj[y].width &&
+                 objects[x].x + objects[x].width > obj[y].x &&
+                 objects[x].y < obj[y].y + obj[y].height &&
+                 objects[x].y + objects[x].height > obj[y].y)) {
+                objects[x].isColliding = true;
+                obj[y].isColliding = true;
+            }
+        }
+    }
+};
 
 
 /**
