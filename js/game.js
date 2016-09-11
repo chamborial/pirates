@@ -18,32 +18,34 @@ var images = new function() {
     this.eball          = new Image();
     this.paused         = new Image();
     this.logo           = new Image();
+    this.gameOver       = new Image();
 
 
-   // Make sure all the required images are loaded before game start
-   // This fixes a known pre IE10 bug where init would be called before images had loaded
-   var imgCount = 12;
-   var imgLoaded = 0;
+    // Make sure all the required images are loaded before game start
+    // This fixes a known pre IE10 bug where init would be called before images had loaded
+    var imgCount = 13;
+    var imgLoaded = 0;
 
-   function imgloaded(){
-       imgLoaded++;
-       if (imgLoaded === imgCount){
-           window.init(); // All images are loaded
-       }
-   }
-   // Have the images call the imgloaded function when they finish loading
-   this.background.onload   = imgloaded;
-   this.playerShip.onload   = imgloaded;
-   this.enemyShip.onload    = imgloaded;
-   this.enemyDuck.onload    = imgloaded;
-   this.enemyRock.onload    = imgloaded;
-   this.enemyCraig.onload   = imgloaded;
-   this.craigWarning.onload = imgloaded;
-   this.explosion.onload    = imgloaded;
-   this.cball.onload        = imgloaded;
-   this.eball.onload        = imgloaded;
-   this.paused.onload       = imgloaded;
-   this.logo.onload         = imgloaded;
+    function imgloaded(){
+        imgLoaded++;
+        if (imgLoaded === imgCount){
+            window.init(); // All images are loaded
+        }
+    }
+    // Have the images call the imgloaded function when they finish loading
+    this.background.onload   = imgloaded;
+    this.playerShip.onload   = imgloaded;
+    this.enemyShip.onload    = imgloaded;
+    this.enemyDuck.onload    = imgloaded;
+    this.enemyRock.onload    = imgloaded;
+    this.enemyCraig.onload   = imgloaded;
+    this.craigWarning.onload = imgloaded;
+    this.explosion.onload    = imgloaded;
+    this.cball.onload        = imgloaded;
+    this.eball.onload        = imgloaded;
+    this.paused.onload       = imgloaded;
+    this.logo.onload         = imgloaded;
+    this.gameOver.onload     = imgloaded;
 
     // Map our image objects to files
     this.background.src     = "img/waterTile.png";
@@ -58,6 +60,7 @@ var images = new function() {
     this.eball.src          = "img/enemyBall.png";
     this.paused.src         = "img/paused.png";
     this.logo.src           = "img/skullAndCrossbones.png";
+    this.gameOver.src       = "img/gameOver.png";
 }
 
 // The base drawable object which all objects with graphics will inherit.
@@ -105,25 +108,11 @@ function Background() {
 }
 Background.prototype = new Drawable();
 
-function Hud() {
-    this.draw = function() {
-
-    }
-
-    this.drawPaused = function() {
-
-    }
-
-    this.drawWarning = function() {
-
-    }
-}
-
 function Game() {
     this.init = function() {
         // Get the 3 canvases
         this.wave = 0;
-        this.state = GAME_STATE.TITLE
+        this.state = GAME_STATE.TITLE;
         this.globalTimer = 0;
         this.pauseDelay = 0;
         this.bossApproachTimer = 0;
@@ -207,6 +196,9 @@ function Game() {
                     this.hudContext.clearRect(452, 560, 175, 60);
                 }
                 break;
+            case GAME_STATE.GAME_OVER:
+                this.hudContext.clearRect(0, 0, 1080, 720);
+                this.hudContext.drawImage(images.gameOver, (1080 - images.gameOver.width)/2, (720 - images.gameOver.height)/2, images.gameOver.width, images.gameOver.height);
             default:
         }
     }
@@ -273,6 +265,7 @@ function doFrame() {
             doPausedFrame();
             break;
         case GAME_STATE.GAME_OVER:
+            doGameOverFrame();
             break;
         default:
     }
@@ -325,6 +318,16 @@ function doPausedFrame() {
         }
     } else {
         game.pauseDelay = game.pauseDelay - 1;
+    }
+}
+
+function doGameOverFrame() {
+    game.background.draw();
+    game.drawHud();
+    if (KEY_STATUS.enter) {
+        if(game.init()) {
+            game.start();
+        }
     }
 }
 

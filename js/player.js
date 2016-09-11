@@ -114,17 +114,17 @@ function Ship() {
                 if (this.x <= 0)
                     this.x = 0;
             }
-            else if (KEY_STATUS.right) {
+            if (KEY_STATUS.right) {
                 this.x += this.speed
-                if (this.x >= this.canvasWidth - this.width) this.x = this.canvasWidth - this.width;
+                if (this.x >= this.canvasWidth - PLAYER_WIDTH) this.x = this.canvasWidth - PLAYER_WIDTH;
             }
-            else if (KEY_STATUS.up) {
+            if (KEY_STATUS.up) {
                 this.y -= this.speed
-                if (this.y <= this.canvasHeight / this.height) this.y = this.canvasHeight / this.height;
+                if (this.y <= 0) this.y = 0;
             }
-            else if (KEY_STATUS.down) {
+            if (KEY_STATUS.down) {
                 this.y += this.speed
-                if (this.y >= this.canvasHeight - this.height) this.y = this.canvasHeight - this.height;
+                if (this.y >= this.canvasHeight - PLAYER_HEIGHT) this.y = this.canvasHeight - PLAYER_HEIGHT;
             }
             // Re draw the player ship
             this.draw();
