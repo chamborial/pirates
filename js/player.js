@@ -1,6 +1,8 @@
-// Player dimensions
+// Player settings
 const PLAYER_WIDTH = 140
 const PLAYER_HEIGHT = 80
+const PLAYER_FIRE_RATE = 15
+
     // Pool object - reuses old objects instead of creating & deleting new ones. (Reduces lag)
 function Pool(maxsize) {
     var size = maxsize; // The maximum number of bullets allowed
@@ -129,7 +131,6 @@ function Ship() {
     this.speed = 5;
     this.ballPool = new Pool(15);
     this.ballPool.init("cball");
-    var rate = 15;
     var counter = 0;
     this.draw = function () {
         this.context.drawImage(images.playerShip, this.x, this.y, PLAYER_WIDTH, PLAYER_HEIGHT);
@@ -141,10 +142,11 @@ function Ship() {
             // Erase current image as movement has been requested
             this.context.clearRect(this.x, this.y, PLAYER_WIDTH, PLAYER_HEIGHT);
 
-            // Used else if instead of switch case - as switch case allowed diagonal movement
+            // Moves the player in various directions by altering the x & y values in correspondence with the speed
+            // The nested if statements ensures that the player cannot move off the screen
             if (KEY_STATUS.left) {
                 this.x -= this.speed
-                if (this.x <= 0) // Ensure the player is within the screen
+                if (this.x <= 0)
                     this.x = 0;
             }
             else if (KEY_STATUS.right) {
@@ -163,7 +165,7 @@ function Ship() {
             this.draw();
         }
         // If space call fire
-        if (KEY_STATUS.space && counter >= rate) {
+        if (KEY_STATUS.space && counter >= PLAYER_FIRE_RATE) {
             this.fire();
             counter = 0;
         }
@@ -174,22 +176,3 @@ function Ship() {
     };
 }
 Ship.prototype = new Drawable();
-/*// Return the pressed key
-// Firefox & Opera = charCode
-document.onkeydown = function(e){
-    alert('test');
-    var keyCode = (e.charCode) ? e.charCode : e.charCode;
-    if (KEY_CODES[keyCode]){
-        e.preventDefault();
-        KEY_STATUS[KEY_CODES[keyCode]] = true;
-    }
-}
-
-// Keyup
-document.onkeyup = function(e){
-    var keyCode = (e.charCode) ? e.charCode : e.charCode;
-    if (KEY_CODES[keyCode]){
-        e.preventDefault();
-        KEY_STATUS[KEY_CODES[keyCode]] = false;
-    }
-    */
