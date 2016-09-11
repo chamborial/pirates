@@ -16,8 +16,6 @@ function Pool(maxsize) {
                 // Initalize the object
                 var cball = new Cball("cball");
                 cball.init(0,0, images.cball.width, images.cball.height);
-                cball.collidableWith = "enemy";
-                cball.type = "cball";
                 pool[i] = cball;
             }
         }
@@ -25,22 +23,10 @@ function Pool(maxsize) {
             for (var i = 0; i < size; i++) {
                 var cball = new Cball("eball");
                 cball.init(0,0, images.eball.width, images.eball.height);
-                cball.collidableWith = "ship";
-                cball.type = "eball";
                 pool[i] = cball;
             }
         }
     };
-
-    this.getPool = function() {
-        var obj = [];
-        for (var i = 0; i < size; i++) {
-            if (pool[i].alive) {
-                obj.push(pool[i]);
-            }
-        }
-        return obj;
-    }
 
     // Gets the last item in the list, initialises it then pushes to start of array
     this.getBall = function (x, y, speed) {
@@ -79,10 +65,7 @@ function Cball(Object) {
         this.context.clearRect(this.x, this.y, BULLET_WIDTH, BULLET_HEIGHT);
         this.x += this.speed;
         // If bullet moves of the screen - return true
-        if(this.collision){
-            return true;
-        }
-        else if (this.self === "cball" && this.x >= this.canvasWidth) {
+        if (this.self === "cball" && this.x >= this.canvasWidth) {
             return isInUse = true;
         }
         else if (this.self === "eball" && this.x <= 0 - this.canvasWidth) {
@@ -105,7 +88,6 @@ function Cball(Object) {
         this.y = 0;
         this.speed = 0;
         this.isInUse = false;
-        this.collision = false;
     };
 }
 Cball.prototype = new Drawable();
@@ -115,8 +97,6 @@ function Ship() {
     this.ballPool = new Pool(15);
     this.ballPool.init("cball");
     var counter = 0;
-    this.collidableWith = "eball";
-    this.type = "ship";
     this.draw = function () {
         this.context.drawImage(images.playerShip, this.x, this.y, PLAYER_WIDTH, PLAYER_HEIGHT);
     };
@@ -152,19 +132,17 @@ function Ship() {
                 }
             }
             // Re draw the player ship
-            if(!this.collision){
             this.draw();
-            }
         }
         // If space call fire
-        if (KEY_STATUS.space && counter >= PLAYER_FIRE_RATE && !this.collision) {
+        if (KEY_STATUS.space && counter >= PLAYER_FIRE_RATE) {
             this.fire();
             counter = 0;
         }
     };
     // FIRE!!!!!!!!!!!
     this.fire = function () {
-        this.ballPool.getBall(this.x+PLAYER_WIDTH - BULLET_WIDTH/2, this.y+PLAYER_HEIGHT/2 - BULLET_HEIGHT/2, 10);
+        this.ballPool.getBall(this.x+PLAYER_WIDTH - BULLET_WIDTH/2, this.y+PLAYER_HEIGHT/2 - BULLET_HEIGHT/2, 4);
     };
 }
 Ship.prototype = new Drawable();

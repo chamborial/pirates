@@ -32,9 +32,6 @@ function Enemy() {
     this.state = ENEMY_STATE.DEAD;
     this.enemyType = ENEMY_TYPE.NONE;
 
-    this.collidableWith = "cball";
-    this.type = "enemy";
-
     this.init = function(x, y, width, height, type, speed) {
         this.x = x;
         this.y = y;
@@ -59,7 +56,6 @@ function Enemy() {
 
     // Move and draw the enemy
     this.draw = function() {
-        if(!this.colliding){
         // Clear the last drawing of the enemy
         this.context.clearRect(this.x - this.speed, this.y - this.speed, this.width + (this.speed * 2), this.height + (this.speed * 2));
         // Draw the enemy if they're alive
@@ -159,7 +155,6 @@ function Enemy() {
                     break;
             }
         }
-    }
     };
     
     this.attemptToFire = function(chance) {
@@ -190,7 +185,6 @@ function Enemy() {
         this.y = 0;
         this.state = ENEMY_STATE.DEAD;
         this.enemyType = ENEMY_TYPE.NONE;
-        this.collision = false;
     }
 }
 Enemy.prototype = new Drawable();
