@@ -65,7 +65,10 @@ function Cball(Object) {
         this.context.clearRect(this.x, this.y, BULLET_WIDTH, BULLET_HEIGHT);
         this.x += this.speed;
         // If bullet moves of the screen - return true
-        if (this.self === "cball" && this.x >= this.canvasWidth) {
+        if(this.collision){
+            return true;
+        }
+        else if (this.self === "cball" && this.x >= this.canvasWidth) {
             return isInUse = true;
         }
         else if (this.self === "eball" && this.x <= 0 - this.canvasWidth) {
@@ -82,27 +85,13 @@ function Cball(Object) {
         }
     };
 
-
-
-// if (this.isColliding) {
-//             return true;
-//         }
-//         else if (self === "cball" && this.y <= 0 - this.height) {
-//             return true;
-//         }
-//         else {
-//             if (self === "cball") {
-//                 this.context.drawImage(imageRepository.cball, this.x, this.y);
-//             }
-//             return false;
-//         }
-
     //Reset
     this.clear = function () {
         this.x = 0;
         this.y = 0;
         this.speed = 0;
         this.isInUse = false;
+        this.collision = false;
     };
 }
 Cball.prototype = new Drawable();
@@ -112,6 +101,8 @@ function Ship() {
     this.ballPool = new Pool(15);
     this.ballPool.init("cball");
     var counter = 0;
+    this.collidableWith = "eball";
+    this.type = "ship";
     this.draw = function () {
         this.context.drawImage(images.playerShip, this.x, this.y, PLAYER_WIDTH, PLAYER_HEIGHT);
     };
@@ -142,17 +133,19 @@ function Ship() {
                 if (this.y >= this.canvasHeight - this.height) this.y = this.canvasHeight - this.height;
             }
             // Re draw the player ship
+            if(!collision){
             this.draw();
+            }
         }
         // If space call fire
-        if (KEY_STATUS.space && counter >= PLAYER_FIRE_RATE) {
+        if (KEY_STATUS.space && counter >= PLAYER_FIRE_RATE && !this.collision) {
             this.fire();
             counter = 0;
         }
     };
     // FIRE!!!!!!!!!!!
     this.fire = function () {
-        this.ballPool.getBall(this.x+PLAYER_WIDTH - BULLET_WIDTH/2, this.y+PLAYER_HEIGHT/2 - BULLET_HEIGHT/2, 4);
+        this.ballPool.getBall(this.x+PLAYER_WIDTH - BULLET_WIDTH/2, this.y+PLAYER_HEIGHT/2 - BULLET_HEIGHT/2, 10);
     };
 }
 Ship.prototype = new Drawable();

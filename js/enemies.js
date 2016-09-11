@@ -32,6 +32,9 @@ function Enemy() {
     this.state = ENEMY_STATE.DEAD;
     this.enemyType = ENEMY_TYPE.NONE;
 
+    this.collidableWith = "cball";
+    this.type = "enemy";
+
     this.init = function(x, y, width, height, type, speed) {
         this.x = x;
         this.y = y;
@@ -56,6 +59,7 @@ function Enemy() {
 
     // Move and draw the enemy
     this.draw = function() {
+        if(!this.colliding){
         // Clear the last drawing of the enemy
         this.context.clearRect(this.x - this.speed, this.y - this.speed, this.width + (this.speed * 2), this.height + (this.speed * 2));
         // Draw the enemy if they're alive
@@ -67,11 +71,11 @@ function Enemy() {
                 if (this.timer >= 200) {
                     // If the enemy is a duck, stop moving.
                     if (this.enemyType === ENEMY_TYPE.DUCK) {
-                        //this.state = ENEMY_STATE.STATIONARY;
-                        this.state = ENEMY_STATE.DYING;
+                        this.state = ENEMY_STATE.STATIONARY;
+                        //this.state = ENEMY_STATE.DYING;
                     } else {
                         this.state = ENEMY_STATE.MOVE_UP;
-                        //this.state = ENEMY_STATE.DYING;
+                        this.state = ENEMY_STATE.DYING;
                     }
                     // Start the enemy half-way through the move up/down cycle
                     this.timer = 50;
@@ -155,6 +159,7 @@ function Enemy() {
                     break;
             }
         }
+    }
     };
     
     this.attemptToFire = function(chance) {
@@ -170,7 +175,7 @@ function Enemy() {
                 case ENEMY_TYPE.CRAIG:
                  
                  for (i = 0; i < Math.floor(Math.random() * 50) + 1; i++) { 
-                    game.enemyBulletPool.getBall(this.x, this.y + this.height/Math.floor(Math.random() * 30) + 1  , Math.floor(Math.random() * -50) + -1);
+                    game.enemyBulletPool.getBall(this.x, this.y + this.height*Math.random(), (Math.random() * -8) - 2);
                  }
                     break;
              default:
@@ -185,6 +190,7 @@ function Enemy() {
         this.y = 0;
         this.state = ENEMY_STATE.DEAD;
         this.enemyType = ENEMY_TYPE.NONE;
+        this.collision = false;
     }
 }
 Enemy.prototype = new Drawable();
