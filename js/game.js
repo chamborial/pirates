@@ -21,7 +21,7 @@ var images = new function() {
     this.gameOver       = new Image();
 
 
-    // Make sure all the required images are loaded before game start
+    // Make sure all the required images are loaded before game star
     // This fixes a known pre IE10 bug where init would be called before images had loaded
     var imgCount = 13;
     var imgLoaded = 0;
@@ -250,6 +250,13 @@ function Game() {
         }
         console.log("Spawned wave ", this.wave);
     }
+
+    this.lives = 3;
+    if(this.lives <= 0){
+        alert("dead");
+        console.log(this.lives);
+    }
+
 }
 
 function doFrame() {
@@ -289,7 +296,7 @@ function doGameFrame() {
     game.ship.move();
     game.ship.ballPool.animate();
     game.enemyBulletPool.animate();
-    //game.enemies.eBallPool.animate();
+    playerHit();
     game.drawHud();
     // Begin the next wave if the last one has been cleared
     if (game.enemies.areAllDead()) {
@@ -347,6 +354,7 @@ window.requestAnimFrame = (function(){
             };
 })();
 
+
 var game = new Game();
 
 function init() {
@@ -354,3 +362,24 @@ function init() {
         game.start();
     }
 }
+
+function playerHit() {
+    if (testCollision(
+        game.ship.x, game.ship.y, PLAYER_WIDTH, PLAYER_HEIGHT, game.enemyBulletPool.x, game.enemyBulletPool.y))
+    {
+        this.lives = this.lives - 1;
+      //  boxArray.splice(i, 1);
+    }           
+};
+
+function testCollision(playerX, playerY, playerWidth, playerHeight, ballX, ballY)
+{
+    //x1, y1 = x and y coordinates of object 1
+    //w1, h1 = width and height of object 1
+    //x2, y2 = x and y coordinates of object 2 (usually midpt)
+    if ((playerX <= ballX && playerX+playerWidth >= ballX) &&
+        (playerY <= ballY && playerY+playerHeight >= ballY))
+            return true;
+    else
+        return false;
+};
