@@ -67,8 +67,8 @@ function Enemy() {
                 if (this.timer >= 200) {
                     // If the enemy is a duck, stop moving.
                     if (this.enemyType === ENEMY_TYPE.DUCK) {
-                        //this.state = ENEMY_STATE.STATIONARY;
-                        this.state = ENEMY_STATE.DYING;
+                        this.state = ENEMY_STATE.STATIONARY;
+                        //this.state = ENEMY_STATE.DYING;
                     } else {
                         this.state = ENEMY_STATE.MOVE_UP;
                         //this.state = ENEMY_STATE.DYING;
@@ -170,7 +170,7 @@ function Enemy() {
                 case ENEMY_TYPE.CRAIG:
                  
                  for (i = 0; i < Math.floor(Math.random() * 50) + 1; i++) { 
-                    game.enemyBulletPool.getBall(this.x, this.y + this.height/Math.floor(Math.random() * 30) + 1  , Math.floor(Math.random() * -50) + -1);
+                    game.enemyBulletPool.getBall(this.x, this.y + this.height*Math.random(), (Math.random() * -8) - 2);
                  }
                     break;
              default:
