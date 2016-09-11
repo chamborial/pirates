@@ -126,12 +126,6 @@ function Enemy() {
 
     // Move and draw the enemy
     this.draw = function() {
-
-        chance = Math.floor(Math.random()*101);
-        if (chance/100 < percentFire) {
-            this.fire();
-        }
-
         // Clear the last drawing of the enemy
         this.context.clearRect(this.x - this.speed, this.y - this.speed, this.width + (this.speed * 2), this.height + (this.speed * 2));
         // Draw the enemy if they're alive
@@ -228,9 +222,14 @@ function Enemy() {
                     break;
             }
         }
-    }
 
-        this.fire = function() {
+         chance = Math.floor(Math.random()*101);
+        if (chance/100 < percentFire) {
+            this.enemyFire();
+        }
+    };
+
+        this.enemyFire = function() {
         game.enemyBulletPool.getBall(this.x+this.width/2, this.y+this.height, -2.5);
     }
 

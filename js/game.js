@@ -182,7 +182,7 @@ function Game() {
         } else {
             return false;
         }
-    }
+    };
 
     this.drawHud = function() {
         switch (this.state) {
@@ -298,6 +298,7 @@ function doGameFrame() {
     game.enemies.draw();
     game.ship.move();
     game.ship.ballPool.animate();
+    game.enemyBulletPool.animate();
     //game.enemies.eBallPool.animate();
     game.drawHud();
     // Begin the next wave if the last one has been cleared

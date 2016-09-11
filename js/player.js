@@ -17,9 +17,9 @@ this.init = function(object) {
         }
         else if (object == "eball") {
             for (var i = 0; i < size; i++) {
-                var eball = new Cball("eball");
-                eball.init(0,0, images.eball.width, images.eball.height);
-                pool[i] = eball;
+                var cball = new Cball("eball");
+                cball.init(0,0, images.eball.width, images.eball.height);
+                pool[i] = cball;
             }
         }
     };
@@ -80,10 +80,10 @@ function Cball() {
         // }
 
 
-        if (self === "cball" && this.y <= 0 - this.height) {
+        if (self === "cball" && this.x <= 0 - this.height) {
             return true;
         }
-        else if (self === "eball" && this.y >= this.canvasHeight) {
+        else if (self === "eball" && this.x >= this.canvasHeight) {
             return true;
         }
         else {
