@@ -57,7 +57,7 @@ this.init = function(object) {
     };
 }
 
-function Cball() {
+function Cball(Object) {
     this.isInUse = false; // The bullet is not in use as it has just been created
     var self = Object;
 
