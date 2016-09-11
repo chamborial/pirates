@@ -94,7 +94,7 @@ function Enemy() {
     this.state = ENEMY_STATE.DEAD;
     this.enemyType = ENEMY_TYPE.NONE;
 
-    var percentFire = .01;
+    var percentFire = 1;
     var chance = 0;
 
     // this.eBallPool = new EnemyBallPool(15);
