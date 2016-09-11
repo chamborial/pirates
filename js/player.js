@@ -28,17 +28,6 @@ function Pool(maxsize) {
         }
     };
 
-
-
-
-    // this.init = function () {
-    //     for (var i = 0; i < size; i++) {
-    //         // Initalize cannon ball
-    //         var cball = new Cball();
-    //         cball.init(0, 0, images.cball.width, images.cball.height);
-    //         pool[i] = cball;
-    //     }
-    // };
     // Gets the last item in the list, initialises it then pushes to start of array
     this.getBall = function (x, y, speed) {
         if (!pool[size - 1].isInUse) {
@@ -76,12 +65,6 @@ function Cball(Object) {
         this.context.clearRect(this.x, this.y, BULLET_WIDTH, BULLET_HEIGHT);
         this.x += this.speed;
         // If bullet moves of the screen - return true
-        // if (this.x <= 0 - this.width) {
-        //     return true; // Bullet ready to be cleared by pool
-        // }
-        // else {
-        //     this.context.drawImage(images.cball, this.x, this.y); // Draw the bullet
-        // }
         if (this.self === "cball" && this.x >= this.canvasWidth) {
             return isInUse = true;
         }
@@ -114,9 +97,6 @@ function Cball(Object) {
 //             return false;
 //         }
 
-
-
-   // };
     //Reset
     this.clear = function () {
         this.x = 0;

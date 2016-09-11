@@ -153,9 +153,6 @@ function Game() {
             Cball.prototype.context             = this.gameContext;
             Cball.prototype.canvasHeight        = this.gameCanvas.height;
             Cball.prototype.canvasWidth         = this.gameCanvas.width;
-        //    Eball.prototype.context             = this.gameContext;
-         //   Eball.prototype.canvasHeight        = this.gameCanvas.height;
-          //  Eball.prototype.canvasWidth         = this.gameCanvas.width;
 
             // Initialise the objects which will always be present
             this.background = new Background();

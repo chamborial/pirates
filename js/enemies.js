@@ -24,68 +24,6 @@ const ROCK_HEIGHT   = 100;
 const CRAIG_WIDTH   = 468;
 const CRAIG_HEIGHT  = 225;
 
-// function EnemyBallPool(max) {
-//     var clipSize = max; // The maximum number of bullets allowed
-//     var eBallPool = [];
-//     this.init = function () {
-//         for (var i = 0; i < clipSize; i++) {
-//             // Initalize enemy ball
-//             var eball = new Eball();
-//             eball.init(0, 0, images.eball.width, images.eball.height);
-//             eBallPool[i] = eball;
-//         }
-//     };
-//     // Gets the last item in the list, initialises it then pushes to start of array
-//     this.getEnemyBall = function (x, y, speed) {
-//         if (!eBallPool[clipSize - 1].isFired) {
-//             eBallPool[clipSize - 1].spawn(x, y, speed);
-//             eBallPool.unshift(eBallPool.pop());
-//         }
-//     };
-//     // When a bullet moves out of view, clear it and move it to the start of the array
-//     this.animate = function () {
-//         for (var i = 0; i < clipSize; i++) {
-//             if (eBallPool[i].isFired) {
-//                 if (eBallPool[i].draw()) {
-//                     eBallPool[i].clear();
-//                     eBallPool.push((eBallPool.splice(i, 1))[0]); // Splice adds new items while removing old
-//                 }
-//             }
-//             else
-//                 break;
-//         }
-//     };
-// }
-
-// function Eball() {
-//     this.isFired = false; // The bullet is not in use as it has just been created
-//     this.spawn = function (x, y, speed) {
-//         this.x = x;
-//         this.y = y;
-//         this.speed = speed;
-//         this.isFired = true;
-//     };
-//     // Use 'dirty rectangle' technique to clear only the area around the bullet
-//     this.draw = function () {
-//         this.context.clearRect(this.x, this.y, this.width, this.height);
-//         this.x -= this.speed;
-//         // If bullet moves of the screen - return true
-//         if (this.x <= 0 - this.width) {
-//             return true; // Bullet ready to be cleared by pool
-//         }
-//         else {
-//             this.context.drawImage(images.eball, this.x, this.y); // Draw the bullet
-//         }
-//     };
-//     //Reset
-//     this.clear = function () {
-//         this.x = 0;
-//         this.y = 0;
-//         this.speed = 0;
-//         this.isFired = false;
-//     };
-// }
-// Eball.prototype = new Drawable();
 
 function Enemy() {
     // Set up the timer which will count up each frame and be used for 'AI' decisions.
@@ -93,11 +31,6 @@ function Enemy() {
     this.speed = 0;
     this.state = ENEMY_STATE.DEAD;
     this.enemyType = ENEMY_TYPE.NONE;
-
-    // this.eBallPool = new EnemyBallPool(15);
-    // this.eBallPool.init();
-    // var fireRate = 15;
-    // var count = 0;
 
     this.init = function(x, y, width, height, type, speed) {
         this.x = x;
@@ -137,8 +70,8 @@ function Enemy() {
                         //this.state = ENEMY_STATE.STATIONARY;
                         this.state = ENEMY_STATE.DYING;
                     } else {
-                        //this.state = ENEMY_STATE.MOVE_UP;
-                        this.state = ENEMY_STATE.DYING;
+                        this.state = ENEMY_STATE.MOVE_UP;
+                        //this.state = ENEMY_STATE.DYING;
                     }
                     // Start the enemy half-way through the move up/down cycle
                     this.timer = 50;
@@ -244,17 +177,6 @@ function Enemy() {
                   game.enemyBulletPool.getBall(this.x - BULLET_WIDTH, this.y + this.height/2 - BULLET_HEIGHT/2, -2.5);
             }
     }
-
-                    //If space call fire
-        // if (KEY_STATUS.space && count >= fireRate) {
-        //     this.enemyFire();
-        //     count = 0;
-        // }
-    
-   // FIRE!!!!!!!!!!!
-    // this.enemyFire = function () {
-    //     this.eBallPool.getEnemyBall(this.x+6, this.y, 4);
-    // }
 
     this.clean = function() {
         this.timer = 0;
