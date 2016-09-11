@@ -230,7 +230,7 @@ function Enemy() {
     };
 
     this.enemyFire = function() {
-        game.enemyBulletPool.getBall(this.x, this.y + this.width/2, -2.5);
+        game.enemyBulletPool.getBall(this.x, this.y + this.height/2, -2.5);
     }
 
                     //If space call fire
