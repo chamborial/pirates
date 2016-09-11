@@ -15,13 +15,14 @@ var images = new function() {
     this.craigWarning   = new Image();
     this.explosion      = new Image();
     this.cball          = new Image();
+    this.eball          = new Image();
     this.paused         = new Image();
     this.logo           = new Image();
 
 
    // Make sure all the required images are loaded before game start
    // This fixes a known pre IE10 bug where init would be called before images had loaded
-   var imgCount = 11;
+   var imgCount = 12;
    var imgLoaded = 0;
 
    function imgloaded(){
@@ -40,6 +41,7 @@ var images = new function() {
    this.craigWarning.onload = imgloaded;
    this.explosion.onload    = imgloaded;
    this.cball.onload        = imgloaded;
+   this.eball.onload        = imgloaded;
    this.paused.onload       = imgloaded;
    this.logo.onload         = imgloaded;
 
@@ -53,6 +55,7 @@ var images = new function() {
     this.craigWarning.src   = "img/craigWarning.png";
     this.explosion.src      = "img/explosion.png";
     this.cball.src          = "img/cannonBall.png";
+    this.eball.src          = "img/enemyBall.png";
     this.paused.src         = "img/paused.png";
     this.logo.src           = "img/skullAndCrossbones.png";
 }
@@ -150,6 +153,9 @@ function Game() {
             Cball.prototype.context             = this.gameContext;
             Cball.prototype.canvasHeight        = this.gameCanvas.height;
             Cball.prototype.canvasWidth         = this.gameCanvas.width;
+        //    Eball.prototype.context             = this.gameContext;
+         //   Eball.prototype.canvasHeight        = this.gameCanvas.height;
+          //  Eball.prototype.canvasWidth         = this.gameCanvas.width;
 
             // Initialise the objects which will always be present
             this.background = new Background();
@@ -168,6 +174,9 @@ function Game() {
 
             this.ship.init(20, 20, 233,
                            100);
+
+            this.enemyBulletPool = new Pool(50);
+            this.enemyBulletPool.init("eball");
 
             return true;
         } else {
@@ -289,6 +298,7 @@ function doGameFrame() {
     game.enemies.draw();
     game.ship.move();
     game.ship.ballPool.animate();
+    //game.enemies.eBallPool.animate();
     game.drawHud();
     // Begin the next wave if the last one has been cleared
     if (game.enemies.areAllDead()) {

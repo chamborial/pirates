@@ -5,14 +5,36 @@ const PLAYER_HEIGHT = 80
 function Pool(maxsize) {
     var size = maxsize; // The maximum number of bullets allowed
     var pool = [];
-    this.init = function () {
-        for (var i = 0; i < size; i++) {
-            // Initalize cannon ball
-            var cball = new Cball();
-            cball.init(0, 0, images.cball.width, images.cball.height);
-            pool[i] = cball;
+
+this.init = function(object) {
+        if (object == "cball") {
+            for (var i = 0; i < size; i++) {
+                // Initalize the object
+                var cball = new Cball("cball");
+                cball.init(0,0, images.cball.width, images.cball.height);
+                pool[i] = cball;
+            }
+        }
+        else if (object == "eball") {
+            for (var i = 0; i < size; i++) {
+                var eball = new Cball("eball");
+                eball.init(0,0, images.eball.width, images.eball.height);
+                pool[i] = eball;
+            }
         }
     };
+
+
+
+
+    // this.init = function () {
+    //     for (var i = 0; i < size; i++) {
+    //         // Initalize cannon ball
+    //         var cball = new Cball();
+    //         cball.init(0, 0, images.cball.width, images.cball.height);
+    //         pool[i] = cball;
+    //     }
+    // };
     // Gets the last item in the list, initialises it then pushes to start of array
     this.getBall = function (x, y, speed) {
         if (!pool[size - 1].isInUse) {
@@ -37,6 +59,8 @@ function Pool(maxsize) {
 
 function Cball() {
     this.isInUse = false; // The bullet is not in use as it has just been created
+    var self = Object;
+
     this.spawn = function (x, y, speed) {
         this.x = x;
         this.y = y;
@@ -45,16 +69,52 @@ function Cball() {
     };
     // Use 'dirty rectangle' technique to clear only the area around the bullet
     this.draw = function () {
-        this.context.clearRect(this.x, this.y, this.width, this.height);
+        this.context.clearRect(this.x-1, this.y-1, this.width+1, this.height+1);
         this.x += this.speed;
         // If bullet moves of the screen - return true
-        if (this.x <= 0 - this.width) {
-            return true; // Bullet ready to be cleared by pool
+        // if (this.x <= 0 - this.width) {
+        //     return true; // Bullet ready to be cleared by pool
+        // }
+        // else {
+        //     this.context.drawImage(images.cball, this.x, this.y); // Draw the bullet
+        // }
+
+
+        if (self === "cball" && this.y <= 0 - this.height) {
+            return true;
+        }
+        else if (self === "eball" && this.y >= this.canvasHeight) {
+            return true;
         }
         else {
-            this.context.drawImage(images.cball, this.x, this.y); // Draw the bullet
+            if (self === "cball") {
+                this.context.drawImage(images.cball, this.x, this.y);
+            }
+            else if (self === "eball") {
+                this.context.drawImage(images.eball, this.x, this.y);
+            }
+            return false;
         }
     };
+
+
+
+// if (this.isColliding) {
+//             return true;
+//         }
+//         else if (self === "cball" && this.y <= 0 - this.height) {
+//             return true;
+//         }
+//         else {
+//             if (self === "cball") {
+//                 this.context.drawImage(imageRepository.cball, this.x, this.y);
+//             }
+//             return false;
+//         }
+
+
+
+   // };
     //Reset
     this.clear = function () {
         this.x = 0;
@@ -67,8 +127,8 @@ Cball.prototype = new Drawable();
 
 function Ship() {
     this.speed = 5;
-    this.ballPool = new Pool(30);
-    this.ballPool.init();
+    this.ballPool = new Pool(15);
+    this.ballPool.init("cball");
     var rate = 15;
     var counter = 0;
     this.draw = function () {
